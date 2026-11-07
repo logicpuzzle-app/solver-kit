@@ -29,6 +29,10 @@ export const I18N = {
     "ja": "行走査DFS",
     "en": "Row-scan DFS"
   },
+  "portfolio": {
+    "ja": "行走査DFS + 並列SAT の並走",
+    "en": "Row-scan DFS and parallel SAT in parallel"
+  },
   "workers": {
     "ja": "ワーカー数",
     "en": "Workers"
@@ -46,8 +50,8 @@ export const I18N = {
     "en": "Auto: {engine} · {threads} workers"
   },
   "engine_hint": {
-    "ja": "20×20 以下は行走査DFS が最速（puzsq の盤面で検証）、25×25 以上の難問は並列SAT。既定は盤面サイズで自動選択。",
-    "en": "Row-scan DFS is fastest up to 20×20 (verified on puzsq boards); parallel SAT for hard 25×25 and larger. The default follows the board size."
+    "ja": "20×20 以下は行走査DFS が最速（puzsq の盤面で検証）。400 マスを超える盤面は行走査DFS と並列SAT を並走させ、先に解けた方を使う。既定は盤面サイズで自動選択。",
+    "en": "Row-scan DFS is fastest up to 20×20 (verified on puzsq boards). Boards over 400 cells run row-scan DFS and parallel SAT side by side and use whichever finishes first. The default follows the board size."
   },
   "examples_intro": {
     "ja": "例(数独・スリザーリンク・ヤジリンは自動生成、ぬりかべとナンバーリンク 20×20 は",

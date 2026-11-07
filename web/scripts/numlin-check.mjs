@@ -122,6 +122,16 @@ try {
     console.log(JSON.stringify({test: `portfolio ${layout}`, ...r}));
   }
   await evaluate(`import('./numlin/scheduler.js').then(m=>{Object.assign(m.defaults,${JSON.stringify(originalPortfolio)})})`);
+  // Boards over 400 cells run DFS and SAT side by side under the auto engine (solver-kit#15).
+  // 21x20 board with each row's pair at its two ends: unique, solved instantly by either engine.
+  await evaluate("document.querySelector('[name=engine][value=auto]').click()");
+  {
+    const r = await submit("p?numlin/21/20/1y12y23y34y45y56y67y78y89y9ayabybcycdydeyefyf-10y-10-11y-11-12y-12-13y-13-14y-14");
+    assert.equal(r.label, "唯一解"); assert.ok(r.paths > 0); assert.equal(r.error, "");
+    assert.ok(await evaluate("window.testWorkers.filter(w=>w.testUrl.includes('/numlin/')).every(w=>w.testTerminated)"));
+    console.log(JSON.stringify({test: "auto portfolio 21x20", ...r}));
+  }
+  await evaluate("document.querySelector('[name=engine][value=sat]').click()");
   const invalid = await submit("p?numlin/2/2/1");
   assert.equal(invalid.label, "中断・エラー"); assert.ok(invalid.error); assert.equal(invalid.stars, 0);
   console.log("PASS invalid URL");
@@ -371,7 +381,7 @@ try {
   }
   console.log("PASS language precedence, persistence, navigator fallback and unavailable storage");
 
-  // Auto engine by board size (<= 400 cells -> DFS, larger -> SAT), auto workers, settings panel behind the gear.
+  // Auto engine by board size (<= 400 cells -> DFS, larger -> DFS and SAT in parallel), auto workers, settings panel behind the gear.
   await evaluate("localStorage.removeItem('numlin-engine'); localStorage.removeItem('numlin-threads')");
   await navigate("");
   const typeUrl = url => evaluate(`document.querySelector('#url').value=${JSON.stringify(url)}; document.querySelector('#url').dispatchEvent(new Event('input')); document.querySelector('#form').dataset.autoEngine`);
@@ -383,7 +393,7 @@ try {
   await evaluate("document.querySelector('#numlin-settings').click()");
   assert.equal(await evaluate("document.querySelector('#numlin-options').hidden"), false);
   assert.ok(["4","8"].includes(await evaluate("document.querySelector('#form').dataset.autoThreads")));
-  assert.equal(await typeUrl("https://puzz.link/p?numlin/25/25/zz"), "sat");
+  assert.equal(await typeUrl("https://puzz.link/p?numlin/25/25/zz"), "portfolio");
   assert.equal(await typeUrl("https://puzz.link/p?numlin/15/15/zz"), "dfs");
   await chooseEngine("sat");
   assert.equal(await typeUrl("https://puzz.link/p?numlin/10/10/zz"), "sat");
