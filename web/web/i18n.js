@@ -101,6 +101,10 @@ export const I18N = {
     "ja": "更新履歴",
     "en": "Changelog"
   },
+  "source_code": {
+    "ja": "ソースコード(MIT / 数独エンジンは GPL-3.0)",
+    "en": "Source code (MIT / Sudoku engine GPL-3.0)"
+  },
   "close": {
     "ja": "閉じる",
     "en": "Close"
