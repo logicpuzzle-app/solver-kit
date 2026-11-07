@@ -258,10 +258,11 @@ solve/enumerate の両方に既知・未知の対照を置き、曖昧な応答�
 一般パズルのソルバーは [cspuz_core](https://github.com/semiexp/cspuz_core)（MIT）。
 配信 wasm に含まれる依存ライセンスは `web/numlin/LICENSE-cspuz_core.txt` を参照。
 `web/cspuz-board.js` は
-[cspuz-solver2 の puzzle-board](https://github.com/semiexp/cspuz-solver2/tree/main/packages/puzzle-board)
-の `renderBoard` / item 描画を DOM API に移植した。
-**MIT License, Copyright (c) 2022 semiexp**。許諾文の全文は移植ファイル先頭に保持する
-（パッケージの metadata は ISC 表記だが、移植元リポジトリの MIT ライセンスに従う）。
+[puzzle-webapp の puzzle-board](https://github.com/semiexp/puzzle-webapp/tree/main/packages/puzzle-board)
+の `renderBoardItems` / item 描画を DOM API に移植した。
+**MIT License, Copyright (c) 2025 semiexp**。
+旧移植の [cspuz-solver2 の puzzle-board](https://github.com/semiexp/cspuz-solver2/tree/main/packages/puzzle-board)
+由来の部分（MIT, Copyright (c) 2022 semiexp）も含む。両方のクレジットと許諾文の全文は移植ファイル先頭に保持する。
 全 item と `grid` / `outer_grid` / `dots` / `empty` を扱い、React・外部 CSS は不要。
 
 CORS は次を完全一致で許可する:

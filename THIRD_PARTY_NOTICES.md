@@ -13,8 +13,9 @@
 - `web/web/numlin/` — cspuz_core / cspuz_rs_puzzles (Copyright (c) 2021- semiexp), its fork
   (wand125/cspuz_core), Glucose and MiniSat: see `web/web/numlin/LICENSE-cspuz_core.txt`.
   rowscan_dfs (Copyright (c) 2026 wand125): see `web/web/numlin/LICENSE-rowscan_dfs.txt`.
-- `web/web/cspuz-board.js` — port of cspuz-solver2 `packages/puzzle-board`,
-  Copyright (c) 2022 semiexp (license header in the file).
+- `web/web/cspuz-board.js` — port of `packages/puzzle-board` from
+  [semiexp/puzzle-webapp](https://github.com/semiexp/puzzle-webapp) (formerly cspuz-solver2),
+  Copyright (c) 2022, 2025 semiexp (license header in the file).
 - Techniques and solver structure derived from [sdvx](https://github.com/3892myamya/sdvx)
   by myamya: `packages/solver-kit/` (core and solvers) and parts of `kits/` (e.g.
   `kits/slitherlink-kit`, `kits/nurikabe-kit/rust/src/techniques/reachable.rs`).

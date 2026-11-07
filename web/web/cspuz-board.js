@@ -1,6 +1,8 @@
 /*
- * Adapted from cspuz-solver2/packages/puzzle-board/src/index.tsx.
- * MIT License — Copyright (c) 2022 semiexp
+ * Adapted from semiexp/puzzle-webapp packages/puzzle-board
+ * (MIT, Copyright (c) 2025 semiexp).
+ * Includes portions adapted from cspuz-solver2/packages/puzzle-board
+ * (MIT, Copyright (c) 2022 semiexp).
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +22,11 @@
  */
 
 export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = {}) {
-  if (board?.kind !== "grid" || ![board.height, board.width].every(n => Number.isInteger(n) && n > 0) || !Array.isArray(board.data)) return null;
-  if (example && (example.kind !== "grid" || example.height !== board.height || example.width !== board.width || !Array.isArray(example.data))) return null;
+  const validBoard = value => value?.kind === "grid" &&
+    [value.height, value.width].every(n => Number.isInteger(n) && n > 0) &&
+    Array.isArray(value.data) && value.data.every(elem => elem && Number.isFinite(elem.y) && Number.isFinite(elem.x));
+  if (!validBoard(board)) return null;
+  if (example && (!validBoard(example) || example.height !== board.height || example.width !== board.width)) return null;
   const el = (tag, attrs, ...children) => {
     const node = doc.createElementNS("http://www.w3.org/2000/svg", tag);
     for (const [key, value] of Object.entries(attrs ?? {})) {
@@ -33,11 +38,13 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
     return node;
   };
   function renderItem(env, y, x, color, item) {
+      if (typeof item !== "string" && (!item || typeof item !== "object")) return null;
       if (typeof item === "string" && /^firefly(Up|Down|Left|Right)$/.test(item)) {
           item = { kind: "firefly", dot: item.slice(7).toLowerCase(), value: -1 };
       }
-      const isVertex = (y % 2 === 0 && x % 2 === 0);
-      const isCell = (y % 2 === 1 && x % 2 === 1);
+      // Remainders of negative odd coordinates are -1, so use parity bits.
+      const isVertex = ((y & 1) === 0 && (x & 1) === 0);
+      const isCell = ((y & 1) === 1 && (x & 1) === 1);
       const isEdge = !(isVertex || isCell);
       const unitSize = isVertex ? (env.unitSize * 0.7) : env.unitSize;
       if (typeof item !== "string" && item.kind === "lineTo") {
@@ -54,7 +61,7 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
               return el("rect", { x: centerX - unitSize * 0.1, y: centerY - unitSize * 0.1, width: unitSize * 0.2, height: unitSize * 0.2, fill: color });
           }
           else if (item === "block") {
-              return el("rect", { x: centerX - unitSize * 0.45, y: centerY - unitSize * 0.45, width: unitSize * 0.9, height: unitSize * 0.9, fill: color });
+              return el("rect", { x: centerX - unitSize * 0.4, y: centerY - unitSize * 0.4, width: unitSize * 0.8, height: unitSize * 0.8, fill: color });
           }
           else if (item === "square") {
               return el("rect", { x: centerX - unitSize * 0.3, y: centerY - unitSize * 0.3, width: unitSize * 0.6, height: unitSize * 0.6, stroke: color, fill: "none" });
@@ -168,7 +175,10 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
           else if (item === "smallFilledCircle") {
               return el("circle", { cx: centerX, cy: centerY, r: env.unitSize * 0.1, stroke: color, fill: color });
           }
-          else if (typeof item === "string" && item.startsWith("firewalkCell")) {
+          else if (item === "middleFilledCircle") {
+              return el("circle", { cx: centerX, cy: centerY, r: env.unitSize * 0.2, stroke: color, fill: color });
+          }
+          else if (typeof item === "string" && /^firewalkCell(Unknown|Ul|Ur|Dl|Dr|UlDr|UrDl)$/.test(item)) {
               let items = [];
               items.push(el("polygon", { points: `${centerX - unitSize / 4},${centerY} ${centerX},${centerY - unitSize / 4} ${centerX + unitSize / 4},${centerY} ${centerX},${centerY + unitSize / 4}`, fill: "#ffe0e0" }));
               if (item === "firewalkCellUl" || item === "firewalkCellUlDr") {
@@ -186,34 +196,11 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
               return el("g", null, items);
           }
           else if (typeof item === "string") {
-              throw new Error("unsupported item: " + item);
+              return null;
           }
           else if ("kind" in item) {
               if (item.kind === "text") {
-                  if (item.pos) {
-                      let xRatio = 0;
-                      let yRatio = 0;
-                      if (item.pos === "upperLeft") {
-                          xRatio = -0.25;
-                          yRatio = -0.25;
-                      }
-                      else if (item.pos === "upperRight") {
-                          xRatio = 0.25;
-                          yRatio = -0.25;
-                      }
-                      else if (item.pos === "lowerLeft") {
-                          xRatio = -0.25;
-                          yRatio = 0.25;
-                      }
-                      else if (item.pos === "lowerRight") {
-                          xRatio = 0.25;
-                          yRatio = 0.25;
-                      }
-                      return el("text", { x: centerX + unitSize * xRatio, y: centerY + unitSize * yRatio, dominantBaseline: "central", textAnchor: "middle", fontSize: unitSize * 0.5, fill: color }, item.data);
-                  }
-                  else {
-                      return el("text", { x: centerX, y: centerY, dominantBaseline: "central", textAnchor: "middle", fontSize: unitSize * 0.8, fill: color }, item.data);
-                  }
+                  return renderTextItem(centerY, centerX, unitSize, color, item);
               }
               else if (item.kind === "compass") {
                   return el("g", null,
@@ -256,7 +243,7 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
                           el("text", { x: centerX + unitSize * 0.3, y: centerY, dominantBaseline: "central", textAnchor: "middle", fontSize: unitSize * 0.6, fill: color }, values[3]));
                   }
               }
-              else if (item.kind === "sudokuCandidateSet") {
+              else if (item.kind === "sudokuCandidateSet" || item.kind === "sudokuForbiddenCandidateMarker") {
                   let items = [];
                   for (let i = 0; i < item.values.length; ++i) {
                       const n = item.values[i];
@@ -264,7 +251,13 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
                       const gy = Math.floor((n - 1) / item.size);
                       const x = centerX - unitSize / 2 + (gx + 0.5) / item.size * unitSize;
                       const y = centerY - unitSize / 2 + (gy + 0.5) / item.size * unitSize;
-                      items.push(el("text", { x: x, y: y, dominantBaseline: "central", textAnchor: "middle", fontSize: unitSize / item.size, fill: color }, n));
+                      const forbidden = item.kind === "sudokuForbiddenCandidateMarker";
+                      items.push(el("text", { x: x, y: y, dominantBaseline: "central", textAnchor: "middle", fontSize: unitSize / item.size * (forbidden ? 0.9 : 1), fill: color }, n));
+                      if (forbidden) {
+                          const crossSize = unitSize / item.size * 0.3;
+                          items.push(el("line", { x1: x - crossSize, y1: y - crossSize, x2: x + crossSize, y2: y + crossSize, stroke: "red", strokeWidth: 1 }));
+                          items.push(el("line", { x1: x + crossSize, y1: y - crossSize, x2: x - crossSize, y2: y + crossSize, stroke: "red", strokeWidth: 1 }));
+                      }
                   }
                   return el("g", null, items);
               }
@@ -288,8 +281,14 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
                       item.value >= 0 &&
                           el("text", { x: centerX, y: centerY, dominantBaseline: "central", textAnchor: "middle", fontSize: unitSize, fill: color }, item.value));
               }
+              else if (item.kind === "thermo" || item.kind === "arrow") {
+                  return renderPathItem(env, centerY, centerX, unitSize, color, item);
+              }
+              else if (item.kind === "regionBorder") {
+                  return renderRegionBorderItem(env, unitSize, color, item);
+              }
           }
-          throw new Error("unsupported item: " + item);
+          return null;
       }
       else if (isEdge) {
           const centerY = env.offsetY + unitSize * (y / 2);
@@ -351,9 +350,112 @@ export function cspuzBoardSVG(board, { doc = document, labels = {}, example } = 
           else if (item === "smallFilledCircle") {
               return el("circle", { cx: centerX, cy: centerY, r: unitSize * 0.1, stroke: color, fill: color });
           }
-          throw new Error("unsupported item: " + item);
+          else if (item === "middleFilledCircle") {
+              return el("circle", { cx: centerX, cy: centerY, r: unitSize * 0.2, stroke: color, fill: color });
+          }
+          else if (item === "circle" || item === "filledCircle") {
+              return el("circle", { cx: centerX, cy: centerY, r: unitSize * 0.4, stroke: color, fill: item === "circle" ? "none" : color });
+          }
+          else if (item === "bar") {
+              const horizontal = y % 2 === 0;
+              return el("rect", {
+                  x: centerX - unitSize * (horizontal ? 0.3 : 0.1),
+                  y: centerY - unitSize * (horizontal ? 0.1 : 0.3),
+                  width: unitSize * (horizontal ? 0.6 : 0.2),
+                  height: unitSize * (horizontal ? 0.2 : 0.6),
+                  fill: color, stroke: "black", strokeWidth: 1,
+              });
+          }
+          else if (typeof item !== "string" && item.kind === "text") {
+              return renderTextItem(centerY, centerX, unitSize, color, item);
+          }
+          return null;
       }
-      throw new Error("items must be on either vertices, cells, or edges");
+      return null;
+  }
+  function renderTextItem(centerY, centerX, unitSize, color, item) {
+      const sizeMultiplier = item.size !== undefined ? item.size : 1;
+      const positions = { upperLeft: [-0.25, -0.25], upperRight: [-0.25, 0.25], lowerLeft: [0.25, -0.25], lowerRight: [0.25, 0.25] };
+      const [yRatio, xRatio] = Object.hasOwn(positions, item.pos) ? positions[item.pos] : [0, 0];
+      return el("text", {
+          x: centerX + unitSize * xRatio, y: centerY + unitSize * yRatio,
+          dominantBaseline: "central", textAnchor: "middle",
+          fontSize: unitSize * (item.pos ? 0.5 : 0.8) * sizeMultiplier, fill: color,
+      }, item.data);
+  }
+  function renderPathItem(env, centerY, centerX, unitSize, color, item) {
+      const arrow = item.kind === "arrow";
+      const elements = [el("circle", {
+          cx: centerX, cy: centerY, r: unitSize * (arrow ? 0.4 : 0.38),
+          stroke: color, fill: arrow ? "none" : color, strokeWidth: 3,
+      })];
+      let prevY = centerY, prevX = centerX;
+      for (let i = 0; i < item.cells.length; ++i) {
+          const cell = item.cells[i];
+          const cellY = env.offsetY + unitSize * (cell.y / 2);
+          const cellX = env.offsetX + unitSize * (cell.x / 2);
+          let startY = prevY, startX = prevX;
+          if (arrow && i === 0) {
+              const d = Math.hypot(cellY - prevY, cellX - prevX);
+              if (d > 0) {
+                  startY += (cellY - prevY) / d * unitSize * 0.4;
+                  startX += (cellX - prevX) / d * unitSize * 0.4;
+              }
+          }
+          elements.push(el("line", {
+              x1: startX, y1: startY, x2: cellX, y2: cellY,
+              stroke: color, strokeWidth: arrow ? 3 : unitSize * 0.25, strokeLinecap: "round",
+          }));
+          prevY = cellY;
+          prevX = cellX;
+      }
+      if (arrow && item.cells.length >= 1) {
+          let fromY = centerY, fromX = centerX;
+          if (item.cells.length >= 2) {
+              const cell = item.cells[item.cells.length - 2];
+              fromY = env.offsetY + unitSize * (cell.y / 2);
+              fromX = env.offsetX + unitSize * (cell.x / 2);
+          }
+          const d = Math.hypot(prevY - fromY, prevX - fromX);
+          const dy = d > 0 ? (prevY - fromY) / d : 0;
+          const dx = d > 0 ? (prevX - fromX) / d : 0;
+          const scale = 0.4 * Math.sqrt(0.5);
+          elements.push(el("line", {
+              x1: prevX, y1: prevY,
+              x2: prevX - dx * unitSize * scale + dy * unitSize * scale,
+              y2: prevY - dy * unitSize * scale - dx * unitSize * scale,
+              stroke: color, strokeWidth: 3, strokeLinecap: "round",
+          }));
+          elements.push(el("line", {
+              x1: prevX, y1: prevY,
+              x2: prevX - dx * unitSize * scale - dy * unitSize * scale,
+              y2: prevY - dy * unitSize * scale + dx * unitSize * scale,
+              stroke: color, strokeWidth: 3, strokeLinecap: "round",
+          }));
+      }
+      return el("g", null, elements);
+  }
+  function renderRegionBorderItem(env, unitSize, color, item) {
+      const elements = [];
+      const neighbors = [{ y: -2, x: 0 }, { y: 2, x: 0 }, { y: 0, x: -2 }, { y: 0, x: 2 }];
+      for (const cell of item.cells) {
+          for (const neighbor of neighbors) {
+              if (item.cells.some(c => c.y === cell.y + neighbor.y && c.x === cell.x + neighbor.x)) continue;
+              const centerY = env.offsetY + unitSize * (cell.y / 2);
+              const centerX = env.offsetX + unitSize * (cell.x / 2);
+              const midY = centerY + (neighbor.y / 2) * unitSize * 0.4;
+              const midX = centerX + (neighbor.x / 2) * unitSize * 0.4;
+              elements.push(el("line", {
+                  x1: midX + (neighbor.y / 2) * 0.4 * unitSize,
+                  y1: midY + (neighbor.x / 2) * 0.4 * unitSize,
+                  x2: midX - (neighbor.y / 2) * 0.4 * unitSize,
+                  y2: midY - (neighbor.x / 2) * 0.4 * unitSize,
+                  stroke: color, strokeWidth: 1,
+                  strokeDasharray: `${unitSize * 0.8 / 6},${unitSize * 0.8 / 9}`,
+              }));
+          }
+      }
+      return el("g", null, elements);
   }
   function aboloPoints(centerY, centerX, unitSize, skip) {
       let ret = [];

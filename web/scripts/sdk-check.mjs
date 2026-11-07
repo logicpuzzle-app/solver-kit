@@ -373,29 +373,111 @@ try {
     }
     const rendererCoverage = await evaluate(`(async()=>{
       const {cspuzBoardSVG}=await import(${JSON.stringify(base + "cspuz-board.js")});
-      const cells=['dot','block','square','triangle','fill','circle','filledCircle','smallCircle','smallFilledCircle',
+      const textItems=[undefined,'upperLeft','upperRight','lowerLeft','lowerRight','center'].flatMap(pos=>
+        [undefined,0,0.75,1.5].map(size=>({kind:'text',data:'<&>',pos,size})));
+      const cells=['dot','block','square','triangle','fill','circle','filledCircle','smallCircle','smallFilledCircle','middleFilledCircle',
         ...['sideArrow','arrow','pencil','firefly'].flatMap(p=>['Up','Down','Left','Right'].map(d=>p+d)),
         ...['UpperLeft','UpperRight','LowerLeft','LowerRight'].map(d=>'abolo'+d),
         'slash','backslash','dottedSlash','dottedBackslash','plus','dottedHorizontalWall','dottedVerticalWall',
         ...['Unknown','Ul','Ur','Dl','Dr','UlDr','UrDl'].map(d=>'firewalkCell'+d),
-        ...[undefined,'upperLeft','upperRight','lowerLeft','lowerRight'].map(pos=>({kind:'text',data:'<&>',pos})),
+        ...textItems,
         {kind:'compass',up:1,down:2,left:3,right:4},
         ...[[1],[1,2],[1,2,3],[-2,2,3,4]].map(value=>({kind:'tapaClue',value})),
         {kind:'sudokuCandidateSet',size:3,values:[1,5,9]},
+        {kind:'sudokuForbiddenCandidateMarker',size:3,values:[1,5,9]},
         ...['up','down','left','right'].map(dot=>({kind:'firefly',dot,value:2})),
+        ...['thermo','arrow','regionBorder'].map(kind=>({kind,cells:[{y:1,x:3},{y:3,x:3}]})),
         {kind:'lineTo',destY:2,destX:2}];
-      const edges=['line','dottedLine','doubleLine','wall','boldWall','dottedWall','cross','smallCircle','smallFilledCircle'];
+      const edges=['line','dottedLine','doubleLine','wall','boldWall','dottedWall','bar','cross',
+        'smallCircle','smallFilledCircle','middleFilledCircle','circle','filledCircle',...textItems,
+        {kind:'lineTo',destY:2,destX:2}];
+      const board=(data=[],defaultStyle='empty')=>({kind:'grid',height:2,width:3,defaultStyle,data});
+      const render=(item,y=1,x=1)=>cspuzBoardSVG(board([{y,x,color:'#123456',item}]));
+      const check=(condition,message)=>{if(!condition)throw Error(message)};
+      const attrs=(node,expected)=>{
+        for(const [name,value] of Object.entries(expected)) {
+          check(node?.getAttribute(name)===String(value),'Wrong '+name+': '+node?.outerHTML);
+        }
+      };
+      const checkItem=(item,y,x)=>{
+        const svg=render(item,y,x);
+        check(svg instanceof SVGSVGElement&&!!svg.querySelector('g')?.querySelector('rect,circle,line,polygon,text'),
+          'Missing item '+JSON.stringify({item,y,x}));
+        for(const text of svg.querySelectorAll('text')) {
+          check(text.children.length===0&&text.hasAttribute('font-size')&&!text.hasAttribute('style'),'Unsafe or CSS-dependent text');
+        }
+        if(item.kind==='text') {
+          const unit=(y&1)===(x&1)&&(y&1)===0?21:30;
+          const offsets={upperLeft:[-0.25,-0.25],upperRight:[-0.25,0.25],lowerLeft:[0.25,-0.25],lowerRight:[0.25,0.25]};
+          const [dy,dx]=offsets[item.pos]??[0,0];
+          attrs(svg.querySelector('text'),{x:30+15*x+unit*dx,y:30+15*y+unit*dy,
+            'font-size':unit*(item.pos?0.5:0.8)*(item.size??1),fill:'#123456'});
+          check(svg.querySelector('text').textContent==='<&>','Unsafe text');
+        }
+      };
       let count=0;
-      for(const item of cells) for(const [y,x] of [[1,1],[0,0]]) {
-        const svg=cspuzBoardSVG({kind:'grid',height:2,width:2,defaultStyle:'outer_grid',data:[{y,x,color:'black',item}]});
-        if(!svg||svg.querySelector('g').children.length<5)throw Error('Missing item '+JSON.stringify(item));
-        if(svg.querySelector('text')?.textContent==='<&>'&&svg.querySelector('text').children.length)throw Error('Unsafe text');
+      for(const item of cells) for(const [y,x] of [[1,1],[0,0],[-1,-1],[-2,-2]]) {
+        checkItem(item,y,x);
         count++;
       }
       for(const item of edges) for(const [y,x] of [[1,2],[2,1]]) {
-        const svg=cspuzBoardSVG({kind:'grid',height:2,width:2,defaultStyle:'outer_grid',data:[{y,x,color:'black',item}]});
-        if(svg.querySelector('g').children.length!==5)throw Error('Missing edge '+item);count++;
+        checkItem(item,y,x);count++;
       }
+      attrs(render('block').querySelector('g rect'),{x:33,y:33,width:24,height:24});
+      attrs(render('middleFilledCircle',0,0).querySelector('circle'),{cx:30,cy:30,r:6,fill:'#123456'});
+      attrs(render('bar',2,1).querySelector('g rect'),{x:36,y:57,width:18,height:6,stroke:'black','stroke-width':1});
+      attrs(render('bar',1,2).querySelector('g rect'),{x:57,y:36,width:6,height:18,stroke:'black','stroke-width':1});
+      const firewalk=render('firewalkCellUnknown').querySelector('g');
+      check(firewalk.querySelectorAll('polygon').length===1&&firewalk.querySelectorAll('line').length===0,'Unknown firewalk');
+      attrs(firewalk.querySelector('polygon'),{points:'37.5,45 45,37.5 52.5,45 45,52.5',fill:'#ffe0e0'});
+      const forbidden=render({kind:'sudokuForbiddenCandidateMarker',size:3,values:[1,5,9]});
+      check(forbidden.querySelectorAll('text').length===3&&forbidden.querySelectorAll('line').length===6,'Forbidden candidates');
+      attrs(forbidden.querySelector('text'),{x:35,y:35,'font-size':9,fill:'#123456'});
+      attrs(forbidden.querySelector('line'),{x1:32,y1:32,x2:38,y2:38,stroke:'red','stroke-width':1});
+      for(const [y,x,unit] of [[1,1,30],[0,0,21]]) {
+        const thermo=render({kind:'thermo',cells:[{y:1,x:3},{y:3,x:3}]},y,x);
+        attrs(thermo.querySelector('circle'),{cx:30+15*x,cy:30+15*y,r:unit*0.38,'stroke-width':3,fill:'#123456'});
+        const lines=thermo.querySelectorAll('line');
+        check(lines.length===2,'Thermo path');
+        attrs(lines[1],{x1:30+unit*1.5,y1:30+unit/2,x2:30+unit*1.5,y2:30+unit*1.5,
+          'stroke-width':unit*0.25,'stroke-linecap':'round'});
+      }
+      for(const cells of [[],[{y:1,x:3}],[{y:1,x:3},{y:3,x:3}],[{y:1,x:1}]]) {
+        const arrow=render({kind:'arrow',cells});
+        attrs(arrow.querySelector('circle'),{cx:45,cy:45,r:12,fill:'none','stroke-width':3});
+        check(arrow.querySelectorAll('line').length===cells.length+(cells.length?2:0),'Arrow path/head');
+        check(!/NaN|Infinity/.test(arrow.outerHTML),'Degenerate arrow');
+        if(cells.length&&cells[0].x===3)attrs(arrow.querySelector('line'),{x1:57,y1:45,x2:75,y2:45,'stroke-width':3,'stroke-linecap':'round'});
+        if(cells.length===2) {
+          const head=arrow.querySelectorAll('line')[2],scale=30*0.4*Math.sqrt(0.5);
+          check(Math.abs(Number(head.getAttribute('x2'))-(75+scale))<1e-10&&
+            Math.abs(Number(head.getAttribute('y2'))-(75-scale))<1e-10,'Arrow head geometry');
+        }
+      }
+      const region=render({kind:'regionBorder',cells:[{y:1,x:1},{y:1,x:3}]});
+      check(region.querySelectorAll('line').length===6,'Region must omit shared borders');
+      attrs(region.querySelector('line'),{x1:33,y1:33,x2:57,y2:33,stroke:'#123456','stroke-width':1,'stroke-dasharray':'4,2.6666666666666665'});
+      for(const item of ['futureItem','firewalkCellFuture',{kind:'futureItem'},null,42]) {
+        for(const [y,x] of [[1,1],[0,0],[1,2]]) {
+          const svg=cspuzBoardSVG(board([{y,x,color:'black',item},{y:1,x:1,color:'black',item:'dot'}],'outer_grid'));
+          check(svg.querySelector('g').children.length===5,'Unknown item must be ignored');
+        }
+      }
+      const valid=board();
+      for(const invalid of [null,{}, {...valid,kind:'other'},{...valid,height:0},{...valid,width:1.5},
+        {...valid,data:null},{...valid,data:[null]},{...valid,data:[{y:NaN,x:1,item:'dot'}]}]) {
+        check(cspuzBoardSVG(invalid)===null,'Invalid board');
+      }
+      check(cspuzBoardSVG(valid,{example:{...valid,width:4}})===null,'Mismatched example');
+      const doc=document.implementation.createHTMLDocument('');
+      const common=board([{y:1,x:1,color:'black',item:{kind:'text',data:'clue'}}],'outer_grid');
+      const example=board([{y:1,x:1,color:'green',item:'fill'}]);
+      const layered=cspuzBoardSVG(common,{doc,labels:{answer:'解答'},example});
+      attrs(layered,{viewBox:'0 0 150 120',width:150,height:120,'aria-label':'解答'});
+      attrs(layered.firstElementChild,{fill:'#fff',width:150,height:120});
+      check(layered.ownerDocument===doc&&[...layered.querySelectorAll('*')].every(n=>n.ownerDocument===doc),'Custom document');
+      check(layered.querySelector('g').children[0].tagName==='rect'&&layered.querySelector('g').children[1].textContent==='clue','Example/common layer order');
+      attrs(cspuzBoardSVG({...valid,hasAnswer:false},{labels:{problem:'問題'}}),{'aria-label':'問題'});
       const styles={};
       for(const defaultStyle of ['outer_grid','grid','dots','empty']){
         const svg=cspuzBoardSVG({kind:'grid',height:2,width:3,defaultStyle,data:[]});
@@ -405,6 +487,7 @@ try {
     })()`);
     assert.ok(rendererCoverage.count > 100);
     assert.deepEqual(rendererCoverage.styles, {outer_grid:4,grid:7,dots:12,empty:0});
+    console.log('PASS cspuz renderer coverage: '+rendererCoverage.count+' item/position variants, geometry, unknown items and wrapper contract');
     assert.equal(await evaluate(`(async()=>{
       const {shouldFallback,fallbackReason,mergeFallback,cspuzSolutions}=await import(${JSON.stringify(base + "sdk/solver.js")});
       const kit={status:'ok',engine:'kit',raw:{kind:'akari',solutions:'1',unknown:3,rating_hundredths:250}};
