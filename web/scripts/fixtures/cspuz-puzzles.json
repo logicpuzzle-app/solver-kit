@@ -1,0 +1,25 @@
+{
+  "source": "cspuz_core/cspuz_rs_puzzles/src/puzzles/* tests (MIT); fillomino URL uses puzz.link instead of pzprxs.vercel.app",
+  "unique": {
+    "heyawake": "https://puzz.link/p?heyawake/6/6/aa66aapv0fu0g2i3k",
+    "hitori": "https://puzz.link/p?hitori/6/5/111.45.2..453.3.1..2....3.3.1.",
+    "lits": "https://puzz.link/p?lits/10/10/08p0i3jbhmjg5j5ik048rgtr8q1e5gkf9hnu",
+    "shakashaka": "https://puzz.link/p?shakashaka/10/10/rdr70bdpdgccrczhcga",
+    "norinori": "https://puzz.link/p?norinori/6/6/mac2a4c11spr",
+    "hashi": "https://puzz.link/p?hashi/6/6/3g1g2.g.g2h.g2g.h.g4g3h4g.g2g.h2",
+    "shikaku": "https://puzz.link/p?shikaku/6/6/s66j4.g8n4h4g",
+    "kakuro": "https://puzz.link/p?kakuro/6/5/Dclh4t9fl3-p-gl-alJeC3BgG",
+    "fillomino": "https://puzz.link/p?fillomino/5/5/g1k34g2h5h4n",
+    "tapa": "https://puzz.link/p?tapa/7/6/2nabg9w8o0h",
+    "star_battle": "https://puzz.link/p?starbattle/6/6/1/2u9gn9c9jpmk",
+    "gokigen": "https://puzz.link/p?gokigen/4/3/l372666bg"
+  },
+  "multiple": {
+    "enumerable": "https://puzz.link/p?heyawake/2/2/001",
+    "common": "https://puzz.link/p?hitori/2/2/1234"
+  },
+  "unsatisfiable": "https://puzz.link/p?heyawake/2/2/002",
+  "kitIncomplete": {
+    "yajilin": "https://puzz.link/p?yajilin/11/10/b2323a22a2323x0.j42j41zj0.q"
+  }
+}

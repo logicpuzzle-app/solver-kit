@@ -1,0 +1,39 @@
+CODE yajilin/10/10/22e23b1040a21i4210t30w40e21n32c20f
+URL https://puzz.link/p?yajilin/10/10/22e23b1040a21i4210t30w40e21n32c20f
+DP 4002469
+BAND expert
+RATING 2.84
+STATUS COMPLETED
+CLUES 12
+BLACKS 12
+ATTEMPTS 1
+yajilin 10 10
+v2 . . . . . v3 . . ^0
+>0 . v1 . . . . . . .
+. . >2 ^0 . . . . . .
+. . . . . . . . . .
+. . . . <0 . . . . .
+. . . . . . . . . .
+. . . . . . . . >0 .
+. . . . v1 . . . . .
+. . . . . . . . . <2
+. . . v0 . . . . . .
+v r---7 r-7 v r-7 ^
+  |   | | |   | |  
+> | v L-J | r-J L-7
+  |       | |     |
+# | > ^ # L-J # r-J
+  |             |  
+r-J # r---7 # r-J #
+|     |   |   |    
+| r-7 | < L---J r-7
+| | | |         | |
+L-J | | r-7 # r-J |
+    | | | |   |   |
+# r-J L-J | r-J > |
+  |       | |     |
+r-J r-7 v L-J r---J
+|   | |       |    
+| # | L---7 # L-7 <
+|   |     |     |  
+L---J v # L-----J #

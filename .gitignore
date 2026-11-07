@@ -1,0 +1,33 @@
+# 依存とビルド生成物
+node_modules/
+dist/
+target/
+web/web/pkg/*.ts
+*.tsbuildinfo
+
+# Rust
+Cargo.lock.orig
+
+# 再生成できる中間生成物(41MB)。手筋の自動発見の出力で、
+# ソルバー本体は読まない。読むのは local_pattern_table.bin の方。
+kits/slitherlink-kit/rust/discovery_output/
+
+# 較正の中間キャッシュ
+kits/*/testdata/features.tsv
+kits/*/testdata/notrial.tsv
+kits/*/testdata/tiers.tsv
+
+# 手元の作業場。ここ自体が独立した git リポジトリで、公開リポジトリには一切入らない。
+# 公開範囲外の資料(他者の著作物から整理した手筋カタログなど)や、
+# 較正の途中経過・使い捨てのスクリプトを置く。
+.work/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / エディタ
+.DS_Store
+.vscode/
+.idea/
+coverage/

@@ -1,0 +1,27 @@
+# 一意解を持つことを確認済みのスリザーリンク問題。
+# 各行は puzz.link のコード。verify.sh と回帰テストで使う。
+#
+# 出所と確認方法:
+#   cbcbcddad          … pzprjs の公式テスト (pzprjs/test/script/slither.js)。
+#                        期待盤面と正解が同梱されており、本実装の解が辺単位で完全一致することを確認済み。
+#   gch1222ch331bg222  … PuzzleTools 内のテストから採取。count_solutions で一意を確認。
+#   h1dgadddg1cgdddcg2cgddbdg1d
+#                      … 同上。
+#   bda7d2dcgbhdbbb6d3abdgd8bbbcdhdgc3d7cdcc
+#                      … 同上。
+#   6b2b76cbbc6ah7656d76dd1dcg6bh56b516b8dcc6bgbbg62d0a3c
+#                      … 同上。探索ノード数が約19万で、この一覧の中では飛び抜けて重い。
+#
+# 採取したが除外したもの（テストに使ってはいけない）:
+#   slither/5/5/j33h2j2g2i2h33j          解が5個以上。solver-kit のテストにある手打ちのダミー。
+#   slither/5/5/2i0a2h2i2a0i2            解なし。solver-kit の TS ソルバーも解なしと判定する。
+#   slither/2/4/dbh                      解が3個。
+#   slither/10/10/dgj2l2i3i11c0c22c2ci1g3h2h1g0ci2c23c1c02ci1i3i2l2jgd
+#                                        本体がセル数を溢れる（カーソルが102で終わる）。解なし。
+#                                        puzzle-kit の URL パーステストで使われているだけで、問題としては成立していない。
+
+slither/5/5/cbcbcddad
+slither/5/5/gch1222ch331bg222
+slither/6/10/h1dgadddg1cgdddcg2cgddbdg1d
+slither/10/10/bda7d2dcgbhdbbb6d3abdgd8bbbcdhdgc3d7cdcc
+slither/12/10/6b2b76cbbc6ah7656d76dd1dcg6bh56b516b8dcc6bgbbg62d0a3c

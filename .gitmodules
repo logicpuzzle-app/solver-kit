@@ -1,0 +1,3 @@
+[submodule "vendor/npgenerator"]
+	path = vendor/npgenerator
+	url = https://github.com/logicpuzzle-app/npgenerator.git

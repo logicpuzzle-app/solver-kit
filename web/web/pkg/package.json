@@ -1,0 +1,17 @@
+{
+  "name": "solver-wasm",
+  "type": "module",
+  "description": "puzz.link URL solver + difficulty rating (sudoku / yajilin / slitherlink / nurikabe / akari)",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "files": [
+    "solver_wasm_bg.wasm",
+    "solver_wasm.js",
+    "solver_wasm.d.ts"
+  ],
+  "main": "solver_wasm.js",
+  "types": "solver_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

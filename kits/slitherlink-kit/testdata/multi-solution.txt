@@ -1,0 +1,10 @@
+# 複数解が確認された問題。難易度評価から除外すること。
+#
+# 一意でない問題は手筋ソルバーが必ず手詰まりになり、手詰まりへの罰点で
+# 「難しい問題」として高いスコアが出てしまう。評価すること自体が誤りである。
+#
+# 検査: slither count <code> --limit 2 --max-nodes 0
+# 詳細は puzsq-corpus.tsv の先頭コメントを参照。
+
+19749	slither/6/4/0agagai.h5aa
+150893	slither/20/12/72d06162a388cdgdjabb6bj7cddbg333dgacg1bgbhcg0c

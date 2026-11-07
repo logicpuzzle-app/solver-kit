@@ -1,0 +1,179 @@
+:root {
+  --ink: #1a1a24;
+  --muted: #6b6b78;
+  --accent: #2456d6;
+  --panel: #f4f4f8;
+  --line: #d7d7e0;
+  --given: #111;
+  --solved: #2456d6;
+  --star: #e8a013;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  line-height: 1.6;
+  background: #fff;
+}
+main { max-width: 720px; margin: 0 auto; padding: 1.25rem 1.25rem 4rem; }
+.brand { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-bottom: 1.5rem; }
+.language-toggle { display: flex; gap: .35rem; border: 0; padding: 0; margin: 0; min-width: 0; font-size: .8rem; }
+.brand-link {
+  display: inline-flex; align-items: center; gap: .5rem;
+  color: var(--ink); text-decoration: none; font-weight: 700; font-size: .95rem;
+}
+.brand-link img { display: block; }
+.brand-link:hover span { text-decoration: underline; }
+h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+.lead { color: var(--muted); margin-top: 0; font-size: .95rem; }
+
+#form { display: flex; gap: .5rem; margin: 1.25rem 0 .25rem; }
+#url {
+  flex: 1; font-size: .95rem; padding: .6rem .75rem;
+  border: 1px solid var(--line); border-radius: 8px; min-width: 0;
+}
+#url:focus { outline: 2px solid var(--accent); border-color: transparent; }
+#solve {
+  font-size: .95rem; padding: .6rem 1.2rem; border: 0; border-radius: 8px;
+  background: var(--accent); color: #fff; cursor: pointer; flex-shrink: 0;
+}
+#solve:disabled { opacity: .5; }
+#numlin-options[hidden] { display: none; }
+#numlin-settings { padding: 0 .55rem; font-size: 1.25rem; line-height: 1; border: 1px solid var(--accent); border-radius: 6px; background: #fff; color: var(--accent); cursor: pointer; }
+#numlin-settings[hidden] { display: none; }
+#numlin-settings[aria-expanded="true"] { background: var(--accent); color: #fff; }
+#numlin-auto { flex-basis: 100%; margin: 0; font-size: .8rem; color: var(--muted); }
+#numlin-options { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem 1rem; margin: .6rem 0; font-size: .85rem; }
+#numlin-options fieldset { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+#numlin-options legend { float: left; padding: 0; margin-right: .3rem; font-weight: 600; }
+.toggle-group label { cursor: pointer; }
+.toggle-group input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-group span { display: inline-block; padding: .25rem .7rem; border: 1px solid var(--accent); border-radius: 6px; color: var(--accent); background: #fff; line-height: 1.2; user-select: none; }
+.toggle-group input:checked + span { background: var(--accent); color: #fff; }
+.toggle-group input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+#numlin-options p { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .8rem; }
+.examples { color: var(--muted); font-size: .85rem; margin-top: .25rem; }
+
+#verdict {
+  background: var(--panel); border-radius: 12px; padding: 1rem 1.25rem;
+  margin: 1.5rem 0 1rem; display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+}
+#verdict .stars { font-size: 1.6rem; color: var(--star); letter-spacing: .1em; }
+#verdict .stars .off { color: var(--line); }
+#verdict .label { font-size: 1.05rem; font-weight: 600; }
+#verdict .sub { color: var(--muted); font-size: .85rem; width: 100%; }
+#verdict.warn { background: #fdf3e4; }
+#verdict.bad { background: #fbe9e9; }
+
+.rating-bar {
+  position: relative; display: flex; width: 100%; max-width: 420px;
+  height: 22px; margin: .35rem 0 .15rem;
+}
+.rating-seg {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; color: var(--muted); background: #e7e7ee;
+  border-right: 2px solid #fff;
+}
+.rating-seg:first-child { border-radius: 6px 0 0 6px; }
+.rating-seg:last-child { border-radius: 0 6px 6px 0; border-right: 0; }
+.rating-seg.active { background: #d3ddf6; color: var(--ink); font-weight: 600; }
+.rating-marker {
+  position: absolute; top: -4px; bottom: -4px; width: 3px;
+  background: var(--accent); border-radius: 2px; transform: translateX(-50%);
+}
+
+#board { overflow-x: auto; }
+#board svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.numlin-answer { background: #fff; }
+.numlin-answer .answer-grid { fill: none; stroke: #aaa; stroke-width: .6; }
+.numlin-answer .answer-border { fill: none; stroke: #aaa; stroke-width: 1.5; }
+.numlin-answer .answer-path { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.numlin-answer .answer-clue-bg { fill: #fff; }
+.numlin-answer .answer-clue { fill: var(--given); text-anchor: middle; dominant-baseline: central; font-weight: 600; }
+
+#detail-box { margin-top: 1rem; color: var(--muted); font-size: .85rem; }
+#detail { display: grid; grid-template-columns: auto 1fr; gap: .1rem 1rem; margin: .5rem 0 0; }
+#detail dt { font-weight: 600; }
+#detail dd { margin: 0; }
+
+#error {
+  background: #fbe9e9; border-radius: 8px; padding: .75rem 1rem; color: #8f2020;
+}
+
+.spinner {
+  display: inline-block; width: 16px; height: 16px; flex-shrink: 0;
+  border: 2.5px solid rgba(36, 86, 214, .25); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+#solve .spinner {
+  width: 13px; height: 13px; border-width: 2px;
+  border-color: rgba(255, 255, 255, .35); border-top-color: #fff;
+  margin-right: .45rem; vertical-align: -2px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#solving[hidden] { display: none; }
+#solving {
+  display: flex; align-items: center; gap: .6rem;
+  background: var(--panel); border-radius: 12px; padding: 1rem 1.25rem;
+  margin: 1.5rem 0 1rem; color: var(--muted);
+  animation: solving-pulse 1.6s ease-in-out infinite;
+}
+#solve-progress { min-width: 0; }
+#cancel { flex-shrink: 0; }
+@keyframes solving-pulse { 50% { opacity: .6; } }
+footer {
+  margin-top: 3rem; color: var(--muted); font-size: .78rem;
+  border-top: 1px solid var(--line); padding-top: 1rem;
+  display: grid; gap: .9rem;
+}
+footer a { color: inherit; }
+.footer-lead { margin: 0; }
+.footer-engines { border-collapse: collapse; text-align: left; }
+.footer-engines caption { text-align: left; margin-bottom: .4rem; }
+.footer-engines th, .footer-engines td {
+  padding: .18rem .9rem .18rem 0; vertical-align: top; font-weight: 400;
+}
+.footer-engines thead th { color: var(--ink); font-weight: 600; }
+.footer-engines tbody td:first-child { color: var(--ink); white-space: nowrap; }
+.footer-engines tbody td:nth-child(3),
+.footer-engines tbody td:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+:lang(en) .footer-engines tbody td:nth-child(3) { white-space: normal; }
+.linklike {
+  background: none; border: 0; padding: 0; font: inherit; color: inherit;
+  text-decoration: underline; cursor: pointer;
+}
+.linklike:hover { color: var(--accent); }
+
+#changelog {
+  max-width: 520px; width: calc(100% - 2rem); border: 1px solid var(--line);
+  border-radius: 12px; padding: 1.5rem; color: var(--ink); background: #fff;
+}
+#changelog::backdrop { background: rgba(26, 26, 36, .35); }
+#changelog h2 { font-size: 1.1rem; margin: 0 0 1rem; }
+.changelog-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; }
+.changelog-list li { display: grid; gap: .2rem; }
+.changelog-list p { margin: 0; font-size: .88rem; }
+.changelog-date {
+  font-size: .75rem !important; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.changelog-close {
+  margin-top: 1.25rem; font-size: .9rem; padding: .45rem 1.1rem; border: 0;
+  border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer;
+}
+
+/* 解析の中断。難しい盤面は仮置きを深く潜るので数十秒かかることがある。
+   待てないときの逃げ道なので、目立ちすぎない見た目にする。
+   #solving は既に flex なので、右端へ寄せるだけでよい。 */
+#cancel {
+  font: inherit; font-size: .8rem; padding: .2rem .7rem;
+  margin-left: auto; cursor: pointer;
+  color: inherit; background: transparent;
+  border: 1px solid currentColor; border-radius: 999px;
+  opacity: .7;
+}
+#cancel:hover { opacity: 1; }
+#cancel:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+.examples .source { color: #777; font-size: 0.9em; }
+.examples .source a { color: inherit; }

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LogicPuzzle Solver — 142種のパズルに対応</title>
+<meta name="description" content="puzz.link の URL から142種のパズルを解き、唯一解かどうかと解答を示すソルバー。数独など6種は難易度も推定。ブラウザ内で動作。">
+<meta property="og:title" content="LogicPuzzle Solver — 142種のパズルに対応">
+<meta property="og:description" content="puzz.link の URL から142種のパズルを解き、唯一解かどうかと解答を示します。数独など6種は難易度も推定。">
+<meta property="og:url" content="https://solver.logicpuzzle.app/">
+<meta property="og:image" content="https://solver.logicpuzzle.app/icon-192.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header class="brand">
+    <a href="https://logicpuzzle.app/" class="brand-link">
+      <img src="logo.webp" alt="LogicPuzzle.App" width="30" height="30">
+      <span>LogicPuzzle.App</span>
+    </a>
+    <fieldset class="toggle-group language-toggle" data-i18n-aria-label="language" aria-label="言語">
+      <label><input type="radio" name="language" value="ja"><span lang="ja">日本語</span></label>
+      <label><input type="radio" name="language" value="en"><span lang="en">English</span></label>
+    </fieldset>
+  </header>
+  <h1>LogicPuzzle Solver</h1>
+  <p class="lead" data-i18n="lead">puzz.link の URL を貼ると、パズルを解いて唯一解かどうかと解答を示します。対応は142種です。数独・スリザーリンク・ヤジリン・ぬりかべ・美術館・ましゅは難易度も推定します。すべてブラウザ内(WebAssembly)で動きます。</p>
+
+  <form id="form">
+    <input id="url" type="text" inputmode="url" spellcheck="false"
+           data-i18n-placeholder="placeholder" data-i18n-aria-label="puzzle_url" placeholder="https://puzz.link/p?sudoku/9/9/… または p?numlin/15/15/…" autofocus>
+    <button id="solve" type="submit" data-i18n="solve">解く</button>
+    <button id="numlin-settings" type="button" hidden aria-expanded="false" aria-controls="numlin-options" data-i18n-aria-label="settings" aria-label="ナンバーリンクの設定" title="設定">&#9881;</button>
+  </form>
+  <div id="numlin-options" hidden>
+    <fieldset class="toggle-group" aria-describedby="numlin-engine-hint">
+      <legend data-i18n="engine">エンジン</legend>
+      <label><input type="radio" name="engine" value="auto" form="form" checked><span data-i18n="auto">自動</span></label>
+      <label><input type="radio" name="engine" value="sat" form="form"><span data-i18n="sat">並列SAT</span></label>
+      <label><input type="radio" name="engine" value="dfs" form="form"><span data-i18n="dfs">行走査DFS</span></label>
+    </fieldset>
+    <fieldset class="toggle-group">
+      <legend data-i18n="workers">ワーカー数</legend>
+      <label><input type="radio" name="threads" value="auto" form="form" checked><span data-i18n="auto">自動</span></label>
+      <label><input type="radio" name="threads" value="1" form="form"><span>1</span></label>
+      <label><input type="radio" name="threads" value="2" form="form"><span>2</span></label>
+      <label><input type="radio" name="threads" value="4" form="form"><span>4</span></label>
+      <label><input type="radio" name="threads" value="8" form="form"><span>8</span></label>
+    </fieldset>
+    <p id="numlin-auto"></p>
+    <p id="numlin-engine-hint" data-i18n="engine_hint">SAT は難問 (25×25〜) 向け、DFS は小〜中盤面や空白マスのない盤面で速いことが多い。</p>
+  </div>
+
+  <p class="examples"><span data-i18n="examples_intro">例(数独・スリザーリンク・ヤジリンは自動生成、ぬりかべとナンバーリンク 20×20 は</span><a href="https://puzsq.logicpuzzle.app/"><span data-i18n="puzzle_square">パズルスクエア</span></a><span data-i18n="examples_source">の実問題。括弧内が出典):</span>
+    <span data-i18n="sudoku">数独</span> <a href="#" class="example" data-url="https://puzz.link/p?sudoku/9/9/g8g2347g5g5i94g2i8i16h4j6g96g4g8g37g3j2h69i1i3g16i5g2g8593g7g">★1</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?sudoku/9/9/2i9h85j1g73i3j4h4h76i5m6i84h9h7j8i35g8j96h2i1">★4</a> / <span data-i18n="yajilin">ヤジリン</span> <a href="#" class="example" data-url="https://puzz.link/p?yajilin/10/10/d21d40b10c21g30b1020b40c21b40v31d31b20e11f20a20e13f20b">★1</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?yajilin/10/10/h2031b10a40q40g4020l30k4020d20e40k10d1110c">★2</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?yajilin/10/10/22e23b1040a21i4210t30w40e21n32c20f">★3</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?yajilin/10/10/42b10l22g21c31c40k4031d41n20e40e40d20p31">★4</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?yajilin/10/10/41g22l41i42n30e41i31k11c40a41f10b30b20a12d">★5</a> / <span data-i18n="slitherlink">スリザーリンク</span> <a href="#" class="example" data-url="https://puzz.link/p?slither/10/10/g73dg7331c218c875ca7027883bj3756218cd888d713b2227cg37c">★1</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?slither/10/10/hbg86010321bdibg3dcl26137382272blb3bgbic32311277dgd">★3</a> / <span data-i18n="nurikabe">ぬりかべ</span> <a href="#" class="example" data-url="https://puzz.link/p?nurikabe/10/10/pepbx3j2s11p5k2g1n1g6k1i" data-i18n-title="source_374" title="パズルスクエア #374 by K.N.Y.">★1</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?nurikabe/10/10/3i3h3n3i3g3zi3h3g3h3u3s3g3h3h3m" data-i18n-title="source_5505" title="パズルスクエア #5505 by 結城">★2</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?nurikabe/10/10/.h1k1g.zi1k1n1k1n1zh.k1j./" data-i18n-title="source_3720" title="パズルスクエア #3720 by mlph">★3</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?nurikabe/10/10/k3k-19p3zg3u3k2k2zm" data-i18n-title="source_127124" title="パズルスクエア #127124 by 名無し">★4</a> <span class="source">(<a href="https://puzsq.logicpuzzle.app/puzzle/374">#374</a>・<a href="https://puzsq.logicpuzzle.app/puzzle/5505">#5505</a>・<a href="https://puzsq.logicpuzzle.app/puzzle/3720">#3720</a>・<a href="https://puzsq.logicpuzzle.app/puzzle/127124">#127124</a>)</span> / <span data-i18n="akari">美術館</span> <a href="#" class="example" data-url="https://puzz.link/p?akari/6/6/md.jahbh.hek">★1</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?akari/6/6/jb.bl.bgbi.hdg./">★2</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?akari/6/6/mcd.qcn">★3</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?akari/13/17/g.jbgbgbjcjbq..s1.bq.bq.lcjbgbgchcq.gcich.r.hcgbhcicjbo.p1.o.bi">★4</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?akari/8/12/p66bo66bo66bv7cn.h7cp">★5</a> / <span data-i18n="masyu">ましゅ</span> <a href="#" class="example" data-url="https://puzz.link/p?mashu/10/10/0ii0000090iiii2j03o1ii000c00000j00">★1</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?mashu/10/10/3090609910092103020630i0609i100910">★2</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?mashu/10/10/036209010a1300c9a0f000339390990900">★3</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?mashu/10/10/00019309400940119c40419040919ci000">★4</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?mashu/10/10/3090a00a3913a13a009030a09a09a30900">★5</a> / <span data-i18n="numberlink">ナンバーリンク</span> <a href="#" class="example" data-url="https://puzz.link/p?numlin/15/15/zg5do9-10n73h7l3h5jd4iaj-11q6hbz1k-10veap9ofm-11g6nfp8i1g2eh2ic4ici8gbw">15×15</a>
+    <a href="#" class="example" data-url="https://puzz.link/p?numlin/20/20/zzo12r3r1o4l2t5h6o7v8h8i7n9iapbcq5tdj3teqf-10pai9n-11i-10h-12veo4hdtfl-11obrcr-126zzo" data-i18n-title="source_2592" title="パズルスクエア #2592 by willow">20×20</a> <span class="source">(<a href="https://puzsq.logicpuzzle.app/puzzle/2592">#2592</a> by willow)</span>
+  </p>
+
+  <details id="supported-puzzles">
+    <summary data-i18n="supported_puzzles">対応パズル（日英名）</summary>
+    <p data-i18n="cspuz_support">ナンバーリンクと、cspuz が対応する141種を解けます。うち数独・スリザーリンク・ヤジリン・ぬりかべ・美術館・ましゅは難易度も推定します。</p>
+    <ul><li>ナンバーリンク / Numberlink</li></ul>
+    <ul id="supported-kinds"></ul>
+  </details>
+
+  <div id="solving" hidden>
+    <span class="spinner" aria-hidden="true"></span><span id="solve-progress" role="status" data-i18n="solving">解析中…</span>
+    <button type="button" id="cancel" data-i18n="cancel">中断</button>
+  </div>
+
+  <section id="output" hidden>
+    <div id="verdict"></div>
+    <h2 id="board-heading" hidden></h2>
+    <div id="board"></div>
+    <details id="detail-box"><summary data-i18n="details">詳細</summary><dl id="detail"></dl></details>
+  </section>
+  <p id="error" hidden></p>
+
+  <dialog id="changelog">
+    <h2 data-i18n="changelog">更新履歴</h2>
+    <ol class="changelog-list">
+      <li>
+        <p class="changelog-date">2026-11-05</p>
+        <p><strong data-i18n="news_numlin_title">ナンバーリンクに対応しました。</strong><span data-i18n="news_numlin">解の有無と唯一性の判定、解答図を表示します。
+        難易度判定は未対応です。複数の Web Worker で並列に解きます。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-05</p>
+        <p><strong data-i18n="news_masyu_title">ましゅに対応しました。</strong><span data-i18n="news_masyu">2,716 問中 2,713 問(99.9%)を手筋で
+        解き切ります。人手評価との一致は 57.4%(±1 以内 97.2%)です。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-05</p>
+        <p><strong data-i18n="news_akari_title">美術館に対応しました。</strong><span data-i18n="news_akari">照らされているマスを薄い色で示すので、
+        途中まで解けた盤面でも「まだ暗いのはどこか」が分かります。
+        人手評価との一致は 62.8%(±1 以内 98.6%)で、いま対応している中では最も高い精度です。
+        2,591 問中 2,585 問を手筋で解き切ります。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-05</p>
+        <p><strong data-i18n="news_multiple_title">解が複数ある問題に難易度をつけないようにしました。</strong>
+        <span data-i18n="news_multiple">答えが 1 つに決まらない問題に「難しさ」は定義できないためです。
+        解の個数が確かめられなかったときは、複数あると決めつけずに難易度を出します。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-05</p>
+        <p><strong data-i18n="news_nurikabe_title">ぬりかべに対応しました。</strong><span data-i18n="news_nurikabe">パズルスクエアの 1,234 問で較正し、
+        93% を解けます。</span></p>
+        <p data-i18n="news_scale">あわせて、同じ難易度の中の細かい差が数値で分かるようにしました。これまでは推定が
+        段階ごとに固まっていて、同じ読みの深さの問題がどれも同じ値になっていました。
+        いまは 0.1 刻みのどこにも問題が入るよう、較正コーパスの分布で目盛りを割っています。</p>
+        <p><span data-i18n="news_stop_before">難しい盤面は仮置きを深く潜るため、解析に数十秒かかることがあります。
+        待てないときは</span><strong data-i18n="cancel">中断</strong><span data-i18n="news_stop_after">を押してください。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-05</p>
+        <p><span data-i18n="news_v5_before">ヤジリンの難易度を</span> <strong>v5</strong> <span data-i18n="news_v5_after">に更新しました。難しさの主軸を「解くのに要った読みの段階」
+        に変えています。基本手筋だけで解けるのか、本数の勘定まで要るのか、仮置きが要るのか——
+        人が難しさを言うときの区別をそのまま目盛りにしました。あわせて「手筋だけでどこまで進めたか」を
+        評価に加えています。人手評価との一致は 58.7% から 59.7% に上がりました。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-04</p>
+        <p><span data-i18n="news_v5_before">ヤジリンの難易度を</span> <strong>v4</strong> <span data-i18n="news_v4_after">に更新しました。盤面の大きさに応じた補正が強すぎて、
+        小さい盤面を高く(6×6 で ★0.55 ぶん)、大きい盤面を低く見積もっていたのを補正し直しています。
+        どの盤面サイズでもずれは ★0.13 以内に収まり、人手評価との一致は 56% から 57% に上がりました。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-04</p>
+        <p><span data-i18n="news_v5_before">ヤジリンの難易度を</span> <strong>v3</strong> <span data-i18n="news_v3_after">に更新しました。v2 では最上位の目盛りを低く取りすぎて、
+        94 問が上限の 5.49 に張り付き、上位の順序が潰れていました。目盛りの上端を広げて 5 問まで減らしています。
+        ★の判定そのものは変わりません。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-04</p>
+        <p><span data-i18n="news_v2_before">ヤジリンの</span><strong data-i18n="news_v2_title">難易度モデルを v2 に更新</strong><span data-i18n="news_v2_after">しました。カット偶奇の手筋
+        (盤面を直線で分けたとき境界を横切る線は偶数、かつ両側に必ず通るマスがあれば 2 本以上)
+        をソルバーに追加し、パズルスクエアの 8,814 問で再較正しています。
+        人手評価との完全一致は 47% から 56% に上がりました。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-03</p>
+        <p data-i18n="news_workers">解答中に固まらないよう、解く処理を Web Worker に分離しました。あわせて
+        難易度バー・解析中アニメーションを追加しています。</p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-03</p>
+        <p><strong data-i18n="news_slither_title">スリザーリンクに対応</strong><span data-i18n="news_slither">しました。数独・スリザーリンク・ヤジリンの
+        3 種を ★1〜5 の推定つきで解けます。</span></p>
+      </li>
+      <li>
+        <p class="changelog-date">2026-08-03</p>
+        <p data-i18n="news_launch">LogicPuzzle Solver を公開しました。</p>
+      </li>
+    </ol>
+    <form method="dialog"><button class="changelog-close" data-i18n="close">閉じる</button></form>
+  </dialog>
+
+  <footer>
+    <p class="footer-lead"><span data-i18n="footer_intro">LogicPuzzle Solver は</span> <a href="https://logicpuzzle.app/">LogicPuzzle.App</a> <span data-i18n="footer_outro">のパズルソルバーです。</span>
+    <button type="button" id="changelog-open" class="linklike" data-i18n="changelog">更新履歴</button></p>
+
+    <table class="footer-engines">
+      <caption><span data-i18n="calibration_intro">難易度は</span><a href="https://puzsq.logicpuzzle.app/" data-i18n="puzzle_square">パズルスクエア</a><span data-i18n="calibration_outro">の人手評価との較正に基づく推定です。スリザーリンクとヤジリンは盤面の大きさで補正しますが、数独は 9×9 の較正をそのまま使うため、それ以外の大きさでは★がずれることがあります。</span></caption>
+      <thead>
+        <tr><th data-i18n="puzzle">パズル</th><th data-i18n="engine">エンジン</th><th data-i18n="calibration">較正</th><th data-i18n="model">モデル</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-i18n="sudoku">数独</td>
+          <td><a href="https://github.com/timedia/puzzle-generator" rel="noopener">NPGenerator V2.0.2</a> <span data-i18n="rust_rewrite_license">の Rust リライト(GPL-3.0)</span></td>
+          <td data-i18n="sudoku_calibration">211 問(9×9 が 85%)</td>
+          <td>v1</td>
+        </tr>
+        <tr>
+          <td data-i18n="slitherlink">スリザーリンク</td>
+          <td>slitherlink-kit</td>
+          <td data-i18n="slither_calibration">1,585 問</td>
+          <td>v1</td>
+        </tr>
+        <tr>
+          <td data-i18n="nurikabe">ぬりかべ</td>
+          <td>nurikabe-kit</td>
+          <td data-i18n="nuri_calibration">1,234 問</td>
+          <td>v1</td>
+        </tr>
+        <tr>
+          <td data-i18n="akari">美術館</td>
+          <td>akari-kit</td>
+          <td data-i18n="akari_calibration">2,591 問</td>
+          <td>v1</td>
+        </tr>
+        <tr>
+          <td data-i18n="yajilin">ヤジリン</td>
+          <td>yajilin-kit</td>
+          <td data-i18n="yajilin_calibration">8,822 問</td>
+          <td>v5</td>
+        </tr>
+        <tr>
+          <td data-i18n="masyu">ましゅ</td>
+          <td>masyu-kit</td>
+          <td data-i18n="masyu_calibration">2,712 問</td>
+          <td>v1</td>
+        </tr>
+        <tr>
+          <td data-i18n="numberlink">ナンバーリンク</td>
+          <td><a href="https://github.com/wand125/rowscan_dfs" target="_blank" rel="noopener">rowscan_dfs</a> (MIT) / <a href="https://github.com/wand125/cspuz_core" target="_blank" rel="noopener">cspuz_core fork</a> (MIT)</td>
+          <td data-i18n="unsupported">未対応</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td data-i18n="other_cspuz_puzzles">その他（対応パズル一覧を参照）</td>
+          <td><a href="https://github.com/wand125/cspuz_core" target="_blank" rel="noopener">cspuz_core fork</a> (MIT) / <a href="https://github.com/semiexp/cspuz-solver2" target="_blank" rel="noopener">cspuz-solver2</a> の盤面描画 (MIT)</td>
+          <td data-i18n="unsupported">未対応</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </footer>
+</main>
+<script type="module" src="main.js"></script>
+</body>
+</html>

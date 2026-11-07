@@ -1,0 +1,195 @@
+<title>スリザーリンク 局所手筋の出現頻度</title>
+<style>
+:root {
+  --paper:#f4f5f6; --ink:#14171c; --muted:#666c77; --rule:#dcdee2;
+  --card:#fff; --line:#1f4f8f; --prior:#a3a9b4; --chip:#e9ebee;
+  --bar:#1f4f8f22; --shadow:0 1px 2px rgba(20,23,28,.07);
+}
+@media (prefers-color-scheme:dark) {
+  :root { --paper:#121419; --ink:#e9ebef; --muted:#8b919c; --rule:#282c34;
+    --card:#191c22; --line:#7db3ee; --prior:#5b626d; --chip:#22262d;
+    --bar:#7db3ee26; --shadow:none; }
+}
+:root[data-theme="dark"] {
+  --paper:#121419; --ink:#e9ebef; --muted:#8b919c; --rule:#282c34;
+  --card:#191c22; --line:#7db3ee; --prior:#5b626d; --chip:#22262d;
+  --bar:#7db3ee26; --shadow:none;
+}
+:root[data-theme="light"] {
+  --paper:#f4f5f6; --ink:#14171c; --muted:#666c77; --rule:#dcdee2;
+  --card:#fff; --line:#1f4f8f; --prior:#a3a9b4; --chip:#e9ebee;
+  --bar:#1f4f8f22; --shadow:0 1px 2px rgba(20,23,28,.07);
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font:15px/1.72 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1000px; margin:0 auto; padding:44px 20px 90px; }
+h1 { font-size:25px; line-height:1.35; margin:0 0 8px; font-weight:640; text-wrap:balance; }
+h2 { font-size:17px; margin:44px 0 4px; font-weight:640; }
+h2 + p { color:var(--muted); font-size:13.5px; margin:0 0 18px; max-width:64ch; }
+.lede { color:var(--muted); margin:0 0 32px; max-width:64ch; font-size:14.5px; }
+.lede b { color:var(--ink); font-weight:600; }
+table { border-collapse:collapse; width:100%; font-size:13.5px;
+  font-variant-numeric:tabular-nums; }
+th { text-align:right; font-weight:500; color:var(--muted); font-size:11px;
+  letter-spacing:.045em; padding:0 0 8px 18px; border-bottom:1px solid var(--rule);
+  white-space:nowrap; }
+th:first-child { text-align:left; padding-left:0; }
+td { text-align:right; padding:8px 0 8px 18px; border-bottom:1px solid var(--rule); }
+td:first-child { text-align:left; padding-left:0; }
+td b { font:600 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace; }
+.pct { color:var(--muted); font-size:11px; margin-left:6px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
+  gap:12px; margin-top:16px; }
+.card { margin:0; background:var(--card); border:1px solid var(--rule);
+  border-radius:3px; padding:11px 8px 8px; text-align:center; box-shadow:var(--shadow);
+  position:relative; overflow:hidden; }
+.card .fill { position:absolute; left:0; bottom:0; height:3px; background:var(--line);
+  opacity:.55; }
+.card svg { display:block; margin:0 auto 7px; }
+figcaption { font-size:11.5px; color:var(--muted); line-height:1.5;
+  font-variant-numeric:tabular-nums; }
+figcaption b { color:var(--ink); font-size:13px; font-weight:640; }
+figcaption code { display:block; margin-top:3px; font:10.5px ui-monospace,
+  SFMono-Regular,Menlo,monospace; opacity:.7; word-break:break-all; }
+figcaption .chip { display:inline-block; background:var(--chip); border-radius:2px;
+  padding:1px 5px; margin-left:5px; font:500 10px/1.5 ui-monospace,SFMono-Regular,
+  Menlo,monospace; vertical-align:1px; }
+.dot { fill:var(--muted); opacity:.45; }
+.line { stroke:var(--line); stroke-linecap:round; }
+.cross { stroke:var(--line); stroke-width:1.3; stroke-linecap:round; opacity:.6; }
+.line.prior { stroke:var(--prior); }
+.cross.prior { stroke:var(--prior); opacity:.75; }
+.clue { fill:var(--ink); font-weight:600; }
+.legend { display:flex; gap:16px; flex-wrap:wrap; align-items:center;
+  margin:0 0 24px; font-size:12px; color:var(--muted); }
+.legend span { display:inline-flex; align-items:center; gap:6px; }
+.legend i { display:inline-block; width:17px; height:3px; border-radius:2px; }
+.legend i.n { background:var(--line); } .legend i.p { background:var(--prior); }
+.tabs { display:flex; gap:5px; flex-wrap:wrap; margin:18px 0 0; }
+.tab { font:600 12.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace; padding:6px 9px;
+  border:1px solid var(--rule); border-radius:3px; background:var(--card);
+  color:var(--ink); cursor:pointer; }
+.tab[aria-selected="true"] { background:var(--line); border-color:var(--line);
+  color:var(--paper); }
+.tab:focus-visible { outline:2px solid var(--line); outline-offset:1px; }
+.note { background:var(--card); border:1px solid var(--rule); border-left:3px solid var(--line);
+  border-radius:3px; padding:14px 16px; margin:26px 0 0; font-size:13.5px; }
+.note b { font-weight:640; }
+footer { margin-top:48px; padding-top:22px; border-top:1px solid var(--rule);
+  color:var(--muted); font-size:12.5px; line-height:1.8; }
+code.inline { background:var(--chip); border-radius:2px; padding:1px 5px;
+  font:12px ui-monospace,SFMono-Regular,Menlo,monospace; }
+.tablewrap { overflow-x:auto; }
+</style>
+
+<div class="wrap">
+<h1>局所手筋は実際どれだけ出てくるか</h1>
+<p class="lede">パズルスクエアに投稿された<b>スリザーリンク 1,585 問</b>を走査し、
+局所手筋がどれだけ現れるかを数えました。数えたのは
+<a href="https://claude.ai/code/artifact/f5ced77f-56d3-42a0-b6d7-21902bf97477">局所手筋ガイド</a>
+に載っている 61,273 通りの形で、回転・鏡映もすべて照合しています。
+延べ <b>49,767 回</b>の出現がありました。</p>
+
+<div class="legend">
+  <span><i class="n"></i>この範囲で初めて決まる辺</span>
+  <span><i class="p"></i>より狭い範囲で既に決まる辺</span>
+  <span>× は「線が引かれない」</span>
+</div>
+
+<h2>範囲の広さ別</h2>
+<p>1 問あたりの出現回数を見ると、狭い範囲の手筋が圧倒的に多く出ます。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>範囲</th><th>形の数</th><th>延べ出現</th><th>1問あたり</th>
+<th>形ごと平均</th><th>最多の形</th><th>1度以上出た形</th></tr></thead>
+<tbody><tr><td><b>1x1</b></td><td>1</td><td>10,440</td><td>6.6</td><td>10440.0</td><td>10,440</td><td>1<span class='pct'>100%</span></td></tr><tr><td><b>1x2</b></td><td>2</td><td>2,533</td><td>1.6</td><td>1266.5</td><td>1,551</td><td>2<span class='pct'>100%</span></td></tr><tr><td><b>1x3</b></td><td>7</td><td>1,606</td><td>1.0</td><td>229.4</td><td>650</td><td>7<span class='pct'>100%</span></td></tr><tr><td><b>2x2</b></td><td>48</td><td>17,273</td><td>10.9</td><td>359.9</td><td>4,237</td><td>48<span class='pct'>100%</span></td></tr><tr><td><b>1x4</b></td><td>9</td><td>675</td><td>0.4</td><td>75.0</td><td>261</td><td>9<span class='pct'>100%</span></td></tr><tr><td><b>2x3</b></td><td>995</td><td>7,427</td><td>4.7</td><td>7.5</td><td>1,044</td><td>593<span class='pct'>60%</span></td></tr><tr><td><b>2x4</b></td><td>10,117</td><td>2,672</td><td>1.7</td><td>0.3</td><td>163</td><td>798<span class='pct'>8%</span></td></tr><tr><td><b>3x3</b></td><td>41,482</td><td>5,814</td><td>3.7</td><td>0.1</td><td>162</td><td>2,322<span class='pct'>6%</span></td></tr><tr><td><b>3x4</b></td><td>8,612</td><td>1,327</td><td>0.8</td><td>0.2</td><td>17</td><td>849<span class='pct'>10%</span></td></tr></tbody>
+</table>
+</div>
+
+<div class="note">
+<b>狭い範囲に価値が集中しています。</b>
+1x1 の <code class="inline">0</code> ひとつで延べ 10,440 回、1 問あたり 6.6 回。
+2x2 までの 67 通りを覚えれば、延べ出現の 64% をカバーできます。
+一方 3x3 の 41,482 通りは <b>94% が 1,585 問に一度も現れません</b>。
+広い範囲の手筋は「知っていれば強いが、出番は稀」という性格です。
+</div>
+
+<h2>よく出る形</h2>
+<p>延べ出現回数の上位 24 件です。カード下部の帯は最多の形に対する相対量を表します。</p>
+<div class="grid" id="topAll"></div>
+
+<h2>範囲ごとの上位</h2>
+<p>範囲を選ぶと、その中での上位 12 件を表示します。</p>
+<div class="tabs" id="tabs"></div>
+<div class="grid" id="topSize"></div>
+
+<footer>
+出典: <code class="inline">slitherlink-kit</code>。問題はパズルスクエアの公開 API から取得した
+1,585 問（変種と非標準 URL を除く）。手筋は <code class="inline">discover</code> による
+1x1〜3x4 の網羅探索で、全 61,273 通りについて実盤面での全解照合を済ませています。<br>
+「延べ出現」は同じ問題の複数箇所で出た分も別々に数えています。「1 度以上出た形」は、
+1,585 問のどこかに 1 回でも現れた形の数です。<br>
+3x4 だけは数字が 5 個以下の配置に限って探索しているため、他の範囲より件数が少なめに出ます。
+</footer>
+</div>
+
+<script>
+const TOP_ALL=[["1x1","0",[0,10,1000,1100],[],10440,1257],["2x2","33/..",[1110],[1001,1201],4237,836],["2x2","30/..",[1010,1111],[1,100,11,110,1001,1100,1200],2731,628],["2x2","00/..",[1110],[0,100,10,110,1000,1100,1200],2455,82],["1x2","3/3",[1,21],[],1551,592],["2x2",".3/3.",[101,21,1201,1011],[],1249,514],["2x2",".3/0.",[111,1101],[10,20,1010,1110],1186,472],["2x2",".1/0.",[110,1100],[10,20,1010,1110],1184,461],["2x3",".3/3./..",[1020],[101,21,1201,1011],1044,385],["1x2","3/0",[1,1001,1101],[10,20,1010,1110],982,460],["1x3","0/3/.",[1020,1120],[0,10,21,1000,1100,1011,1111],650,339],["2x2","33/2.",[21,1101,1110],[1001,1201],465,253],["2x2","33/1.",[1110],[1001,1201],347,207],["1x3","3/3/2",[11],[1,21],320,193],["2x3","33/../3.",[1101],[1001,1201,1110],288,137],["1x4","3/3/./3",[11],[1,21],261,122],["2x3","3./.3/2.",[1220],[1,121,1001,1211],223,134],["2x2","32/0.",[100,111,1200],[1,10,20,1001,1101,1010,1110],205,128],["1x3","3/3/1",[30,1020,1120],[1,21],196,123],["2x2","03/2.",[1111,1210],[0,101,10,111,1000,1100,1201],193,117],["2x2","23/0.",[111,1101],[10,20,1010,1110],189,141],["2x3",".3/.3/2.",[111],[101,10,121],188,127],["2x3","3./.3/1.",[1220],[1,121,1001,1211],186,115],["2x2","33/21",[21,1101,1110],[1001,1201],181,91]];
+const PER_SIZE={"1x1":[["1x1","0",[0,10,1000,1100],[],10440,1257]],"1x2":[["1x2","3/3",[1,21],[],1551,592],["1x2","3/0",[1,1001,1101],[10,20,1010,1110],982,460]],"1x3":[["1x3","0/3/.",[1020,1120],[0,10,21,1000,1100,1011,1111],650,339],["1x3","3/3/2",[11],[1,21],320,193],["1x3","3/3/1",[30,1020,1120],[1,21],196,123],["1x3","3/2/0",[1],[20,30,1020,1120],137,100],["1x3","2/3/0",[1,1000,1100],[11,20,30,1011,1111,1020,1120],126,95],["1x3","1/3/0",[0,1000,1100],[11,20,30,1011,1111,1020,1120],92,74],["1x3","0/2/0",[1011,1111],[0,10,20,30,1000,1100,1020,1120],85,63]],"2x2":[["2x2","33/..",[1110],[1001,1201],4237,836],["2x2","30/..",[1010,1111],[1,100,11,110,1001,1100,1200],2731,628],["2x2","00/..",[1110],[0,100,10,110,1000,1100,1200],2455,82],["2x2",".3/3.",[101,21,1201,1011],[],1249,514],["2x2",".3/0.",[111,1101],[10,20,1010,1110],1186,472],["2x2",".1/0.",[110,1100],[10,20,1010,1110],1184,461],["2x2","33/2.",[21,1101,1110],[1001,1201],465,253],["2x2","33/1.",[1110],[1001,1201],347,207],["2x2","32/0.",[100,111,1200],[1,10,20,1001,1101,1010,1110],205,128],["2x2","03/2.",[1111,1210],[0,101,10,111,1000,1100,1201],193,117],["2x2","23/0.",[111,1101],[10,20,1010,1110],189,141],["2x2","33/21",[21,1101,1110],[1001,1201],181,91]],"1x4":[["1x4","3/3/./3",[11],[1,21],261,122],["1x4","3/3/./2",[11],[1,21],147,102],["1x4","3/3/./1",[11],[1,21],119,95],["1x4","3/3/1/1",[11],[1,21,30,1020,1120],31,25],["1x4","1/2/3/0",[0,1000,1100],[11,21,30,40,1010,1110,1021,1121,1030,1130],28,24],["1x4","3/3/1/2",[11],[1,21,30,1020,1120],28,24],["1x4","1/3/2/0",[0,1000,1100],[11,30,40,1030,1130],22,16],["1x4","3/3/1/3",[11,41,1031,1131],[1,21,30,1020,1120],20,16],["1x4","3/1/3/0",[1,1001,1101],[10,21,30,40,1010,1110,1021,1121,1030,1130],19,16]],"2x3":[["2x3",".3/3./..",[1020],[101,21,1201,1011],1044,385],["2x3","33/../3.",[1101],[1001,1201,1110],288,137],["2x3","3./.3/2.",[1220],[1,121,1001,1211],223,134],["2x3",".3/.3/2.",[111],[101,10,121],188,127],["2x3","3./.3/1.",[1220],[1,121,1001,1211],186,115],["2x3",".3/.3/1.",[111],[101,10,121],169,108],["2x3","00/../0.",[120],[0,100,10,110,20,30,1000,1100,1200,1110,1020,1120],144,14],["2x3","33/../1.",[1101],[1001,1201,1110],142,101],["2x3","33/../2.",[1101],[1001,1201,1110],141,102],["2x3","0./2./0.",[111,121,1210],[0,10,20,30,1000,1100,1011,1111,1020,1120],136,60],["2x3","3./2./0.",[110],[1,20,30,1020,1120],136,73],["2x3",".3/3./3.",[130,1000,1110,1020,1121],[101,11,21,120,31,1201,1011],131,96]],"2x4":[["2x4",".3/.3/../3.",[111],[101,10,121],163,71],["2x4","33/../../3.",[1101],[1001,1201,1110],103,72],["2x4",".3/.3/../2.",[111],[101,10,121],76,55],["2x4",".3/.3/../1.",[111],[101,10,121],73,59],["2x4",".3/3./3./..",[1130],[101,11,21,120,31,130,1000,1201,1011,1110,1020,1121],48,37],["2x4","33/../../2.",[1101],[1001,1201,1110],48,36],["2x4","33/../../31",[1101],[1001,1201,1110],43,40],["2x4","33/../../32",[1101],[1001,1201,1110],43,34],["2x4",".0/.3/2./..",[1030],[100,11,110,20,121,31,1100,1200,1111,1211,1021,1120,1220],40,28],["2x4","1./2./3./0.",[111],[0,11,21,120,30,131,40,1000,1100,1010,1110,1021,1121,1030,1130],40,20],["2x4","33/../../22",[1101],[1001,1201,1110],40,28],["2x4","33/../../33",[1101,1131],[1001,1201,1110,1120,1031,1231],35,20]],"3x3":[["3x3","..3/33./...",[1220],[201,11,110,20,121,220,1000,1100,1301,1011,1111,1211,1120],162,99],["3x3",".33/.../3..",[1201],[1101,1301,1210],139,87],["3x3",".33/.../2..",[1201],[1101,1301,1210],96,70],["3x3",".33/.../1..",[1201],[1101,1301,1210],88,64],["3x3","..3/.3./2..",[31,1021],[201,20,121,1301,1111,1120],82,54],["3x3","..0/33./...",[1020],[200,111,210,21,1100,1200,1300,1011,1211,1120],70,55],["3x3",".30/2../...",[1020],[0,101,200,10,111,210,21,1101,1200,1300,1011,1110,1211],54,39],["3x3","0../3.3/...",[1320],[0,10,111,21,120,221,1000,1100,1200,1011,1111,1311,1020,1120],50,40],["3x3","..3/.2./0..",[110,211,121,1201,1111,1210],[20,30,1020,1120],50,37],["3x3","..3/02./...",[1121],[201,10,20,121,1301,1010,1110],41,40],["3x3","..0/02./...",[1120],[200,10,111,210,20,120,1101,1200,1300,1010,1110,1211],38,34],["3x3",".3./3.3/.2.",[120],[0,101,200,110,21,221,1101,1201,1011,1311,1020,1320],33,25]],"3x4":[["3x4",".33/.../.../3..",[1201],[1101,1301,1210],17,13],["3x4",".3./.3./.3./3..",[200],[101,10,111,210,20,121,220,131,230,41,1100,1201,1111,1210,1120,1221,1031,1230],13,8],["3x4","..3/..3/.../3..",[211],[201,110,221],12,9],["3x4","..3/.3./2../...",[1030],[201,20,121,31,1301,1111,1021,1120],11,10],["3x4","..3/0../..3/0..",[120,130,1120],[10,20,30,40,1010,1110,1030,1130],11,4],["3x4","3.3/.3./.../.3.",[100],[1,201,110,20,121,220,1001,1301,1111,1211,1120,1220],11,8],["3x4","2../.3./..3/0..",[130,1120],[1,10,111,30,231,40,1001,1100,1111,1321,1030,1130,1330],9,9],["3x4",".3./..2/.3./3..",[0,101,1101,1300],[211,121,220,41,1210,1311,1221,1031],9,7],["3x4","3../..2/.3./3..",[1300],[211,121,220,41,1210,1311,1221,1031],8,8],["3x4",".3./3.3/.../.3.",[120],[0,101,200,110,21,221,1101,1201,1011,1311,1020,1320],8,6],["3x4","3.3/.2./3.3/...",[1030,1330],[1,201,31,231,1001,1301,1021,1321],7,5],["3x4","..3/.3./.../0..",[130],[201,20,121,30,40,1301,1111,1120,1030,1130],7,5]]};
+const MAXHIT=TOP_ALL[0][4];
+
+function svg(clues,novel,prior,cell){
+  const CELL=cell||24, PAD=Math.round(CELL*0.42);
+  const rows=clues.split('/'), H=rows.length, W=rows[0].length;
+  const w=W*CELL+PAD*2, h=H*CELL+PAD*2;
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img">`;
+  for(let y=0;y<=H;y++) for(let x=0;x<=W;x++)
+    s+=`<circle cx="${PAD+x*CELL}" cy="${PAD+y*CELL}" r="${Math.max(1.4,CELL*0.062)}" class="dot"/>`;
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){
+    const ch=rows[y][x]; if(ch==='.') continue;
+    s+=`<text x="${PAD+x*CELL+CELL/2}" y="${PAD+y*CELL+CELL/2}" class="clue"
+      style="font-size:${Math.round(CELL*0.46)}px" text-anchor="middle"
+      dominant-baseline="central">${ch}</text>`;
+  }
+  for(const [list,cls] of [[prior||[],' prior'],[novel,'']]) for(const p of list){
+    const k=Math.floor(p/1000), x=Math.floor(p%1000/100), y=Math.floor(p%100/10), st=p%10;
+    const x1=PAD+x*CELL, y1=PAD+y*CELL;
+    const x2=k===0?x1+CELL:x1, y2=k===0?y1:y1+CELL;
+    if(st===1) s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="line${cls}"
+      style="stroke-width:${Math.max(2.2,CELL*0.104)}"/>`;
+    else {
+      const mx=(x1+x2)/2, my=(y1+y2)/2, d=CELL*0.12;
+      s+=`<path d="M${mx-d} ${my-d}L${mx+d} ${my+d}M${mx+d} ${my-d}L${mx-d} ${my+d}" class="cross${cls}"/>`;
+    }
+  }
+  return s+'</svg>';
+}
+
+function card(r,scale){
+  const [sz,clues,novel,prior,hits,probs]=r;
+  const pct=Math.max(2,Math.round(hits/scale*100));
+  return `<figure class="card">${svg(clues,novel,prior)}<figcaption>`
+    +`<b>${hits.toLocaleString()}回</b>${sz?`<span class="chip">${sz}</span>`:''}<br>`
+    +`${probs.toLocaleString()}問で出現<code>${clues}</code></figcaption>`
+    +`<div class="fill" style="width:${pct}%"></div></figure>`;
+}
+
+document.getElementById('topAll').innerHTML=TOP_ALL.map(r=>card(r,MAXHIT)).join('');
+
+const sizes=Object.keys(PER_SIZE);
+const tabs=document.getElementById('tabs'), topSize=document.getElementById('topSize');
+tabs.innerHTML=sizes.map((s,i)=>
+  `<button class="tab" role="tab" aria-selected="${i===0}" data-s="${s}">${s}</button>`).join('');
+function showSize(s){
+  const rs=PER_SIZE[s];
+  const scale=rs.length?rs[0][4]:1;
+  topSize.innerHTML=rs.map(r=>card(r,scale)).join('');
+  for(const t of tabs.children) t.setAttribute('aria-selected',String(t.dataset.s===s));
+}
+tabs.addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(t) showSize(t.dataset.s);
+});
+showSize(sizes[0]);
+</script>

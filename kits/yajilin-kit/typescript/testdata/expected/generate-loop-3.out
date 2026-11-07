@@ -1,0 +1,39 @@
+CODE yajilin/10/10/42n10a10i40b30a40j10j31b40b30e40g2021f20g20e11c
+URL https://puzz.link/p?yajilin/10/10/42n10a10i40b30a40j10j31b40b30e40g2021f20g20e11c
+DP 1000700
+BAND medium
+RATING 1.75
+STATUS COMPLETED
+CLUES 16
+BLACKS 8
+ATTEMPTS 1
+yajilin 10 10
+>2 . . . . . . . . .
+. . . . . ^0 . ^0 . .
+. . . . . . . >0 . .
+<0 . >0 . . . . . . .
+. . . ^0 . . . . . .
+. . . . <1 . . >0 . .
+<0 . . . . . >0 . . .
+. . . . v0 v1 . . . .
+. . v0 . . . . . . .
+v0 . . . . . ^1 . . .
+> # r-7 r-------7 #
+    | | |       |  
+r---J L-J ^ # ^ L-7
+|                 |
+L-----7 # r-7 > r-J
+      |   | |   |  
+< # > L-7 | L-7 L-7
+        | |   |   |
+r---7 ^ L-J r-J r-J
+|   |       |   |  
+L-7 | # < r-J > L-7
+  | |     |       |
+< | | r---J > r-7 |
+  | | |       | | |
+r-J L-J v v r-J | |
+|           |   | |
+L-7 v # r---J r-J |
+  |     |     |   |
+v L-----J # ^ L---J

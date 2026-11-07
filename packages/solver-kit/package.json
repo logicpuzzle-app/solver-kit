@@ -1,0 +1,78 @@
+{
+  "name": "@logicpuzzle-app/solver-kit",
+  "version": "0.2.1",
+  "description": "Abstract puzzle solver framework - constraint propagation and backtracking engine for 180+ puzzle types",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/core/index.js",
+      "types": "./dist/core/index.d.ts"
+    },
+    "./constraints": {
+      "import": "./dist/constraints/index.js",
+      "types": "./dist/constraints/index.d.ts"
+    },
+    "./solvers": {
+      "import": "./dist/solvers/index.js",
+      "types": "./dist/solvers/index.d.ts"
+    },
+    "./examples/yajilin-plugin": {
+      "import": "./dist/examples/yajilin-plugin.js",
+      "types": "./dist/examples/yajilin-plugin.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint src",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "puzzle",
+    "solver",
+    "logic-puzzle",
+    "constraint-propagation",
+    "backtracking",
+    "sudoku",
+    "slitherlink",
+    "akari",
+    "nurikabe",
+    "nonogram",
+    "kakuro",
+    "masyu",
+    "heyawake"
+  ],
+  "author": "LogicPuzzle App",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logicpuzzle-app/solver-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/logicpuzzle-app/solver-kit/issues"
+  },
+  "homepage": "https://github.com/logicpuzzle-app/solver-kit#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

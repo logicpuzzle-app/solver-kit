@@ -1,0 +1,35 @@
+{
+  "name": "yajilin-kit",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Yajilin solver, constraint engine and puzzle generator",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "yajilin": "node --import tsx src/cli.ts",
+    "verify": "sh verify.sh",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.10"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cli": {
+      "default": "./dist/cli.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

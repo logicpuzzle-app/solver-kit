@@ -1,0 +1,7 @@
+# Firebase App Hosting 設定(静的配信のみの軽量構成)
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512

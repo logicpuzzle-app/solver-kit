@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solver SDK v1 検証</title>
+<style>
+  body { font: 16px system-ui; max-width: 900px; margin: 32px auto; padding: 0 16px; }
+  input { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 8px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  #board svg { max-width: 100%; height: auto; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #171717; color: #eee; }
+  }
+</style>
+<h1>Solver SDK v1 検証</h1>
+<form id="form">
+  <label for="url">puzz.link URL</label>
+  <input id="url" required value="https://puzz.link/p?numlin/2/2/1h1">
+  <button id="solve">解く</button>
+  <button id="cancel" type="button" disabled>中止</button>
+</form>
+<pre id="progress" aria-live="polite"></pre>
+<div id="board"></div>
+<pre id="result" aria-live="polite"></pre>
+<script type="module">
+  const sdk = await import(new URLSearchParams(location.search).get('sdk') || "http://localhost:8964/sdk/v1/index.js");
+  window.sdk = sdk;
+  let controller;
+  document.querySelector('#cancel').onclick = () => controller?.abort();
+  document.querySelector('#form').onsubmit = async event => {
+    event.preventDefault();
+    controller?.abort();
+    const run = controller = new AbortController();
+    document.querySelector('#cancel').disabled = false;
+    document.querySelector('#result').textContent = '';
+    document.querySelector('#board').replaceChildren();
+    document.querySelector('#progress').textContent = '解析中…';
+    const result = await sdk.solve(document.querySelector('#url').value, {
+      signal: run.signal,
+      onProgress: progress => { document.querySelector('#progress').textContent = JSON.stringify(progress, null, 2); },
+    });
+    if (run !== controller) return;
+    const svg = sdk.renderAnswer(result, { labels: { answer: '解答', problem: '問題' } });
+    document.querySelector('#board').replaceChildren(...(svg ? [svg] : []));
+    document.querySelector('#result').textContent = JSON.stringify(result, null, 2);
+    document.querySelector('#progress').textContent = '';
+    document.querySelector('#cancel').disabled = true;
+  };
+</script>
+</html>

@@ -1,0 +1,80 @@
+{
+  "source": "main 9a175bd, before board.js extraction",
+  "boards": {
+    "sudoku": {
+      "viewBox": "-2 -2 364 364",
+      "width": "360",
+      "elements": 102,
+      "tags": {
+        "rect": 1,
+        "line": 20,
+        "text": 81
+      }
+    },
+    "yajilin": {
+      "viewBox": "-2 -2 404 404",
+      "width": "400",
+      "elements": 159,
+      "tags": {
+        "rect": 29,
+        "text": 36,
+        "line": 94
+      }
+    },
+    "slitherlink": {
+      "viewBox": "-12 -12 424 424",
+      "width": "424",
+      "elements": 280,
+      "tags": {
+        "rect": 1,
+        "text": 50,
+        "line": 108,
+        "circle": 121
+      }
+    },
+    "nurikabe": {
+      "viewBox": "-2 -2 404 404",
+      "width": "400",
+      "elements": 135,
+      "tags": {
+        "rect": 65,
+        "circle": 36,
+        "text": 12,
+        "line": 22
+      }
+    },
+    "akari": {
+      "viewBox": "-2 -2 244 244",
+      "width": "240",
+      "elements": 85,
+      "tags": {
+        "rect": 37,
+        "text": 4,
+        "circle": 30,
+        "line": 14
+      }
+    },
+    "masyu": {
+      "viewBox": "-2 -2 404 404",
+      "width": "400",
+      "elements": 107,
+      "tags": {
+        "rect": 1,
+        "line": 86,
+        "circle": 20
+      }
+    },
+    "numlin": {
+      "viewBox": "0 0 362 362",
+      "width": "600",
+      "elements": 87,
+      "tags": {
+        "path": 1,
+        "polyline": 17,
+        "circle": 34,
+        "text": 34,
+        "rect": 1
+      }
+    }
+  }
+}

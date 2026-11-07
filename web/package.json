@@ -1,0 +1,17 @@
+{
+  "name": "solver-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "puzz.link URL solver + difficulty rating (sudoku / yajilin / slitherlink / nurikabe / akari), Rust wasm",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'wasm is prebuilt: see README (wasm-pack build)'"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}

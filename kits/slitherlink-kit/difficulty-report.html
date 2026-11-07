@@ -1,0 +1,306 @@
+<title>スリザーリンク難易度 — 目視照合シート</title>
+<style>
+:root {
+  --paper:#f2f3f0; --raised:#fbfbfa; --ink:#14161a; --ink-soft:#5b6069; --ink-faint:#8b9099;
+  --rule:#cdd0ca; --rule-soft:#e0e2dd; --indigo:#33418c; --over:#9c4a21; --under:#1c6a72;
+  --over-wash:#9c4a2118; --under-wash:#1c6a7218; --mid-wash:#33418c14;
+  --display:"Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
+  --body:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  --data:ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark) { :root {
+  --paper:#15171a; --raised:#1c1f23; --ink:#e7e8e4; --ink-soft:#a1a6ad; --ink-faint:#71767e;
+  --rule:#343840; --rule-soft:#24272c; --indigo:#97a2e4; --over:#dd8a55; --under:#63bcc2;
+  --over-wash:#dd8a5520; --under-wash:#63bcc220; --mid-wash:#97a2e418; } }
+:root[data-theme="dark"] {
+  --paper:#15171a; --raised:#1c1f23; --ink:#e7e8e4; --ink-soft:#a1a6ad; --ink-faint:#71767e;
+  --rule:#343840; --rule-soft:#24272c; --indigo:#97a2e4; --over:#dd8a55; --under:#63bcc2;
+  --over-wash:#dd8a5520; --under-wash:#63bcc220; --mid-wash:#97a2e418; }
+:root[data-theme="light"] {
+  --paper:#f2f3f0; --raised:#fbfbfa; --ink:#14161a; --ink-soft:#5b6069; --ink-faint:#8b9099;
+  --rule:#cdd0ca; --rule-soft:#e0e2dd; --indigo:#33418c; --over:#9c4a21; --under:#1c6a72;
+  --over-wash:#9c4a2118; --under-wash:#1c6a7218; --mid-wash:#33418c14; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:4rem 1.5rem 6rem;display:flex;flex-direction:column;gap:4rem}
+.masthead{display:flex;flex-direction:column;gap:1rem}
+.eyebrow{font-family:var(--data);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--indigo)}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(1.9rem,4.5vw,2.9rem);line-height:1.25;margin:0;text-wrap:balance}
+.lede{max-width:62ch;color:var(--ink-soft);margin:0} .lede strong{color:var(--ink);font-weight:600}
+.stats{display:flex;flex-wrap:wrap;gap:0 2.5rem;padding-top:.5rem;border-top:1px solid var(--rule)}
+.stat{display:flex;flex-direction:column;padding-top:.75rem}
+.stat-num{font-family:var(--data);font-size:1.35rem;font-variant-numeric:tabular-nums}
+.stat-label{font-size:.78rem;color:var(--ink-faint)}
+section{display:flex;flex-direction:column;gap:1.5rem}
+h2{font-family:var(--display);font-weight:600;font-size:1.4rem;margin:0;display:flex;align-items:baseline;gap:.9rem}
+h2 .count{font-family:var(--data);font-size:.8rem;color:var(--ink-faint);font-weight:400}
+.note{margin:0;color:var(--ink-soft);max-width:64ch;font-size:.92rem}
+.note strong{color:var(--ink);font-weight:600}
+.ladder{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.rung{display:grid;grid-template-columns:3.5rem minmax(0,17rem) 1fr;gap:1rem;align-items:start;padding:1.1rem 0;border-bottom:1px solid var(--rule-soft)}
+.rung-num{font-family:var(--display);font-size:1.9rem;line-height:1;color:var(--indigo);font-variant-numeric:tabular-nums}
+.rung-sig{font-size:.95rem}
+.rung-dp{font-family:var(--data);font-size:.78rem;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{font-family:var(--data);font-size:.76rem;padding:.2rem .55rem;border:1px solid var(--rule);border-radius:2px;color:var(--ink-soft);text-decoration:none;background:var(--raised);white-space:nowrap}
+.chip:hover,.chip:focus-visible{border-color:var(--indigo);color:var(--indigo)}
+.chip .sz{color:var(--ink-faint)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.row{border-bottom:1px solid var(--rule-soft)}
+.row-link{display:grid;grid-template-columns:4.6rem 10.5rem 9.5rem 4rem 6rem 7rem 1fr;gap:.9rem;align-items:center;padding:.7rem .4rem;text-decoration:none;color:inherit}
+.row-link:hover,.row-link:focus-visible{background:var(--raised);outline:none}
+.row-link:focus-visible{box-shadow:inset 2px 0 0 var(--indigo)}
+.cell{font-size:.85rem;white-space:nowrap}
+.id{font-family:var(--data);color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.verdict{display:flex;align-items:baseline;gap:.4rem;font-family:var(--data);font-variant-numeric:tabular-nums}
+.declared{color:var(--ink-soft)} .arrow{color:var(--ink-faint)} .estimate{font-size:1.05rem}
+.estimate.over,.delta-num.over{color:var(--over)} .estimate.under,.delta-num.under{color:var(--under)}
+.delta{display:flex;align-items:center;gap:.5rem}
+.bar{position:relative;display:block;flex:1;height:.55rem;background:var(--rule-soft);border-left:1px solid var(--rule)}
+.bar-fill{position:absolute;top:0;bottom:0} .bar-fill.over{background:var(--over)} .bar-fill.under{background:var(--under)}
+.delta-num{font-family:var(--data);font-size:.78rem;font-variant-numeric:tabular-nums}
+.meta{font-family:var(--data);color:var(--ink-soft);font-variant-numeric:tabular-nums;font-size:.78rem}
+.trial{color:var(--ink-faint)}
+.pill{font-size:.7rem;padding:.1rem .45rem;border-radius:2px;white-space:nowrap}
+.pill-done{background:var(--under-wash);color:var(--under)}
+.pill-mid{background:var(--mid-wash);color:var(--indigo)}
+.pill-stop{background:var(--over-wash);color:var(--over)}
+table{border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums}
+th{text-align:right;font-weight:500;color:var(--ink-faint);font-size:.72rem;letter-spacing:.04em;padding:0 0 .5rem 1.4rem;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child{text-align:left;padding-left:0}
+td{text-align:right;padding:.45rem 0 .45rem 1.4rem;border-bottom:1px solid var(--rule-soft)}
+td:first-child{text-align:left;padding-left:0}
+.scroller{overflow-x:auto} .scroller>.rows{min-width:56rem}
+@media (max-width:720px){.rung{grid-template-columns:2.5rem 1fr}.rung-sig,.chips{grid-column:2}}
+</style>
+<div class="wrap">
+<header class="masthead">
+<p class="eyebrow">slitherlink-kit · 難易度推定の照合</p>
+<h1>目視で確かめるための照合シート</h1>
+<p class="lede">パズルスクエアの投稿者が申告した難易度と、ソルバーの推定値を突き合わせた結果です。まず<strong>各評価の基準となる問題</strong>で尺度の感覚を掴み、次に<strong>大きくずれた問題</strong>を見て、ずれが推定側の誤りなのか申告側の癖なのかを判断してください。各行をクリックすると puzz.link で開きます。</p>
+<div class="stats">
+<div class="stat"><span class="stat-num">1,573</span><span class="stat-label">照合した問題数</span></div>
+<div class="stat"><span class="stat-num">57%</span><span class="stat-label">四捨五入して完全一致</span></div>
+<div class="stat"><span class="stat-num">98%</span><span class="stat-label">±1 以内</span></div>
+<div class="stat"><span class="stat-num">0.73</span><span class="stat-label">順位相関</span></div>
+</div>
+<p class="note">一致率は較正に使った問題そのもので測った値です。自分で引いた線を自分で採点した数字なので、汎化性能としては別に測った 5-fold 交差検証の順位相関（訓練との差 0.004）を見てください。<strong>推定値が整数ちょうどにならないのは意図したもの</strong>で、四捨五入したときに正しい評価へ落ちるよう帯を置いています。小数部を細かい難易度として読まないでください。</p>
+</header>
+
+<section>
+<h2>基準の梯子<span class="count">各評価の中央値ちょうどの問題</span></h2>
+<p class="note">その評価の中央値付近のスコアを持つ問題です。ソルバーがどこで詰まるかが評価ごとにきれいに分かれます — 評価が上がるほど仮置きが深く多くなり、評価 5 では 7 割超で手筋そのものが尽きます。</p>
+<div class="ladder"><div class="rung"><div class="rung-num">1</div>
+<div><div class="rung-sig">仮置きを使わずに解ける</div><div class="rung-dp">DPN 中央値 360 · n=147</div></div>
+<div class="chips"><a class="chip" href="https://puzz.link/p?slither/9/9/h163c22bg232agdg26dg5c57c7dg52cgdg111cg20c383d" target="_blank" rel="noopener">#101783 <span class="sz">9x9</span></a><a class="chip" href="https://puzz.link/p?slither/40/31/azv5.g0000ag0000ag0000ag0ag0ah.h.ai5ai5ai5a55ah.g5500555005550055a55ai05555555555555a55ai5.500555005550055a55ah.h.ai5ai5ai5a55ah.g5500555000a550aa55ai0555555ai505aa5500ag5.55555ai5555a5ah5.h.00500500ai00a0a0ag00005.gazv00000000000000000000000000000000000000000azv5.k0000ag0000ag0000ag0ai.h.jai5ai5ai55ai.gai50000550055500555aj0ai5ai555555555aj5.j5000a555555555ai.h.jai5555555555ai.gai500005555555555aj0ai5ai5005550055500ah5.j5aiai5ai5aha.h.j00aj0000ag0000ag0000a.gazv0000000000000000000000000000000000000000azx00555005005ag00500500am555agag5agagag5am0055aagaag00ag50.amag0050050050050050050005555e" target="_blank" rel="noopener">#7408 <span class="sz">40x31</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/j2ah0dh83ar0d303asdj3a030dv82a25d" target="_blank" rel="noopener">#167378 <span class="sz">10x10</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/g8232ah6c32088ccg202a3203dl3bl3323c302cgb88310b8dh3316b" target="_blank" rel="noopener">#155496 <span class="sz">10x10</span></a></div></div><div class="rung"><div class="rung-num">2</div>
+<div><div class="rung-sig">仮置きが必要になる（深さ 1–1 / 18–41 回）</div><div class="rung-dp">DPN 中央値 1064 · n=524</div></div>
+<div class="chips"><a class="chip" href="https://puzz.link/p?slither/10/10/jai333b03266323cqdh223323031chcq13388231c123cidh" target="_blank" rel="noopener">#1800 <span class="sz">10x10</span></a><a class="chip" href="https://puzz.link/p?slither/4/8/1711c1c1c1c1c2c37a" target="_blank" rel="noopener">#155408 <span class="sz">4x8</span></a><a class="chip" href="https://puzz.link/p?slither/6/6/31abicg5ba136521bgc" target="_blank" rel="noopener">#153789 <span class="sz">6x6</span></a><a class="chip" href="https://puzz.link/p?slither/7/7/2222222222222222222222272222222222212272222222c" target="_blank" rel="noopener">#124132 <span class="sz">7x7</span></a></div></div><div class="rung"><div class="rung-num">3</div>
+<div><div class="rung-sig">仮置きが必要になる（深さ 1–1 / 28–66 回）</div><div class="rung-dp">DPN 中央値 1636 · n=660</div></div>
+<div class="chips"><a class="chip" href="https://puzz.link/p?slither/11/11/g7d166dg7665768dg87ag711bg67dg668bg88dg106dg66bg5788758bg681c5d" target="_blank" rel="noopener">#118829 <span class="sz">11x11</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/581c38bhai38506ciac63dcc26ddci73760dich71d386c" target="_blank" rel="noopener">#4268 <span class="sz">10x10</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/21bi2bi02ah10di1di2bi273c180ci3bi2bi11dh23ci1ai31b" target="_blank" rel="noopener">#11865 <span class="sz">10x10</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/876ag65cg86cg66bg8dc5c617c6db5ag77cg67ag68cg876a" target="_blank" rel="noopener">#124098 <span class="sz">10x10</span></a></div></div><div class="rung"><div class="rung-num">4</div>
+<div><div class="rung-sig">仮置きが必要になる（深さ 1–2 / 38–98 回）</div><div class="rung-dp">DPN 中央値 3133 · n=206</div></div>
+<div class="chips"><a class="chip" href="https://puzz.link/p?slither/11/11/ag6bgabdbg318831dgbibchbh8b31d5bhbhdbibg318831dgbdbbg6bgb" target="_blank" rel="noopener">#167605 <span class="sz">11x11</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/66271c776dg52762cdg87371c637c18177cgc28827ag777b28277b" target="_blank" rel="noopener">#20967 <span class="sz">10x10</span></a><a class="chip" href="https://puzz.link/p?slither/17/17/gd6dhdg7ddg176cj5756a22271ckdgaj213c6cg3ckbg878dgcgdjd2ah2120bg1cdmd0bg2111ch2cdjcgag787dgdk2cg5c111bjcgck37233d8758dj670dgd6agbh7cb" target="_blank" rel="noopener">#12634 <span class="sz">17x17</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/6bj73676cgcb122727bh112c716c212ch727222cbcg76727cj7c" target="_blank" rel="noopener">#105454 <span class="sz">10x10</span></a></div></div><div class="rung"><div class="rung-num">5</div>
+<div><div class="rung-sig">手筋だけでは解き切れない（深さ 2–3 / 6–75 回）</div><div class="rung-dp">DPN 中央値 8996 · n=36</div></div>
+<div class="chips"><a class="chip" href="https://puzz.link/p?slither/11/11/h67221c3167732671acg6cg76777cg62ag752cg7cg77cg766ca7bgbg217722727d" target="_blank" rel="noopener">#166407 <span class="sz">11x11</span></a><a class="chip" href="https://puzz.link/p?slither/16/9/a27dg8d68cg22cg76cgbi6cg73c6dg73cdadd17cg7c18cg7dicg76cg13cg78b7ag53bc" target="_blank" rel="noopener">#169312 <span class="sz">16x9</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/hbbj66bg16661bg666b6666161166b666bh6661b166bjbb" target="_blank" rel="noopener">#104229 <span class="sz">10x10</span></a><a class="chip" href="https://puzz.link/p?slither/10/10/g7167ccgc21611cbccbc71dcci7361817cbg766c7bh6781b" target="_blank" rel="noopener">#153132 <span class="sz">10x10</span></a></div></div></div>
+</section>
+
+<section>
+<h2>どこで詰まるか<span class="count">推論レベルの分布</span></h2>
+<p class="note">スコアとは別に、<strong>どの機構まで必要になるか</strong>を見た分類です。スコアが「どれだけ働いたか」を測るのに対し、こちらは「何が要るか」を示します。★1 の 7 割は仮置きすら不要で、★5 の 7 割は手筋を尽くしても解き切れません。</p>
+<table>
+<thead><tr><th>申告</th><th>問題数</th><th>仮置き不要</th><th>仮置きあり</th><th>手筋切れ</th></tr></thead>
+<tbody><tr><td>★1</td><td>147</td><td>73%</td><td>27%</td><td>0%</td></tr><tr><td>★2</td><td>524</td><td>31%</td><td>68%</td><td>1%</td></tr><tr><td>★3</td><td>660</td><td>7%</td><td>91%</td><td>2%</td></tr><tr><td>★4</td><td>206</td><td>0%</td><td>76%</td><td>24%</td></tr><tr><td>★5</td><td>36</td><td>0%</td><td>28%</td><td>72%</td></tr></tbody></table>
+</section>
+
+<section>
+<h2>推定が高すぎる<span class="count">10件</span></h2>
+<p class="note">申告より難しく評価してしまった問題。<strong>10 件すべてが申告 ★1〜★2</strong> です。盤面の大きさはまちまち（3x3 から 31x22 まで）で、サイズに偏りはありません。<strong>易しいと申告された問題ほど、推定が上振れしやすい</strong>という形になっています。</p>
+<p class="note">共通するのは、ソルバーが仮置きに頼っている点です（10 件中 7 件が仮置きあり、3 件は手筋切れ）。人間が定跡で一息に片付ける形が当方の手筋セットに無く、その穴を仮置きで埋めているぶんスコアが膨らむ、という仮説が立ちます。<strong>手筋の追加で縮む余地があるのはこちら側</strong>です。</p>
+<div class="scroller"><ul class="rows"><li class="row"><a class="row-link" href="https://puzz.link/p?slither/16/16/iblcg1721212121212b6bn267721212126b66bj7c77721266b666b77c777212126b6661777c2177c66b661212177c7cgch6b6121212121726cicjb1212121212121cgbhcic" target="_blank" rel="noopener">
+<span class="cell id">#111446</span>
+<span class="cell verdict"><span class="declared">申告 2</span><span class="arrow">→</span><span class="estimate over">4.97</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:28.490314307438354%"></span></span><span class="delta-num over">+2.97</span></span>
+<span class="cell meta">16x16</span>
+<span class="cell meta">DPN 20340</span>
+<span class="cell state"><span class="pill pill-stop">手筋切れ</span></span>
+<span class="cell meta trial">深さ3 / 5回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/10/10/181bbi1611d11d616161b1bh16b1bh1b16166165167161bg11d1bg1b" target="_blank" rel="noopener">
+<span class="cell id">#150444</span>
+<span class="cell verdict"><span class="declared">申告 2</span><span class="arrow">→</span><span class="estimate over">4.56</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:24.53878187450428%"></span></span><span class="delta-num over">+2.56</span></span>
+<span class="cell meta">10x10</span>
+<span class="cell meta">DPN 9435</span>
+<span class="cell state"><span class="pill pill-stop">手筋切れ</span></span>
+<span class="cell meta trial">深さ4 / 44回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/9/12/i8dh38838dk8dd8c7227c77737cg272272didg7dk83883dh8dg" target="_blank" rel="noopener">
+<span class="cell id">#156005</span>
+<span class="cell verdict"><span class="declared">申告 2</span><span class="arrow">→</span><span class="estimate over">4.25</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:21.576591674566473%"></span></span><span class="delta-num over">+2.25</span></span>
+<span class="cell meta">9x12</span>
+<span class="cell meta">DPN 6551</span>
+<span class="cell state"><span class="pill pill-stop">手筋切れ</span></span>
+<span class="cell meta trial">深さ4 / 33回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/31/22/5555550ag05555555555agagagag5ag5555aaaaaaaa5550aaaaaaaa0555aaaaaaaa5550aaaaaaaa0555aaaaaaaa500000aaaaaaaa0ak5ag5ag5ahaak55555aa55ah0000055555505a5000ah5555555ag55aiaah5ag5ai5ai0aaaaaa00aa0005aaaaaa5aaag0aaaaaa5aa0005aaaaaa5a0ai0aa0ag0aa0aaaiaa0a5aaa000000005aa5agaa0apag5a5aa5am05555a5ag5500000000a" target="_blank" rel="noopener">
+<span class="cell id">#127265</span>
+<span class="cell verdict"><span class="declared">申告 1</span><span class="arrow">→</span><span class="estimate over">2.94</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:18.599957417521708%"></span></span><span class="delta-num over">+1.94</span></span>
+<span class="cell meta">31x22</span>
+<span class="cell meta">DPN 1699</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 216回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/10/10/r11111bgbjbbh6bbgbb211bg6ck6bk611111111cnc" target="_blank" rel="noopener">
+<span class="cell id">#150366</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate over">4.91</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:18.293320463371913%"></span></span><span class="delta-num over">+1.91</span></span>
+<span class="cell meta">10x10</span>
+<span class="cell meta">DPN 18692</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ8 / 131回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/9/9/p8272d62dn12312dg12312dn27a3637cn" target="_blank" rel="noopener">
+<span class="cell id">#159113</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate over">4.76</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:16.9224638197081%"></span></span><span class="delta-num over">+1.76</span></span>
+<span class="cell meta">9x9</span>
+<span class="cell meta">DPN 14909</span>
+<span class="cell state"><span class="pill pill-stop">手筋切れ</span></span>
+<span class="cell meta trial">深さ6 / 7回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/32/16/g6cgdjdau6dh6dj13132103268dbgdladldjci11132bh76376bg223321dchdhal7agbgdd6ah232221322ag5dgc5c526blccdgb826bh83b066d3c2achdhbldhcgdg6188b031100211bhcg68a77abl7522022dg7dchcj8ak11dbh881782agc3d251733113agdm5bg2cgcm16dhbcg22dagdbg3di1a2ca" target="_blank" rel="noopener">
+<span class="cell id">#14040</span>
+<span class="cell verdict"><span class="declared">申告 2</span><span class="arrow">→</span><span class="estimate over">3.76</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:16.894487360115612%"></span></span><span class="delta-num over">+1.76</span></span>
+<span class="cell meta">32x16</span>
+<span class="cell meta">DPN 3850</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 164回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/24/24/idg8cgdibg1daa22cg0256agak3dgdh66blbqah322120233110201226b70dj2cj3aj3c0b3cj36dh2cj2bj2bh822103232221021021bj2cj2cj2c3d2dj2d1a3dj1cj1cj2bh5202020222222111137dh2cgcg2dgcjak1263bg32c56di2c2cg2bhbi822c2dg6dbda1bg2cdgc8dh3277223121332cda2c72722a3cgag1cg727cjdi1bh62cl1c0bg7a2222031113223bg22ai222221322c" target="_blank" rel="noopener">
+<span class="cell id">#14035</span>
+<span class="cell verdict"><span class="declared">申告 2</span><span class="arrow">→</span><span class="estimate over">3.73</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:16.6386661734104%"></span></span><span class="delta-num over">+1.73</span></span>
+<span class="cell meta">24x24</span>
+<span class="cell meta">DPN 3703</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 125回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/10/10/l33djdgdidgdidgdk3d33d227dgdh3dl3dgdh833d33d" target="_blank" rel="noopener">
+<span class="cell id">#121245</span>
+<span class="cell verdict"><span class="declared">申告 1</span><span class="arrow">→</span><span class="estimate over">2.72</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:16.495694024940804%"></span></span><span class="delta-num over">+1.72</span></span>
+<span class="cell meta">10x10</span>
+<span class="cell meta">DPN 1422</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 55回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/15/15/ag5agajaiaagag5aaahai5a5ag5ahaaaiagaah5aag06ai51agag5agagaaiagaag5ahaaai5a5ag5aaahaiaagag5agah" target="_blank" rel="noopener">
+<span class="cell id">#153002</span>
+<span class="cell verdict"><span class="declared">申告 1</span><span class="arrow">→</span><span class="estimate over">2.71</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill over" style="left:50%;width:16.45899575564325%"></span></span><span class="delta-num over">+1.71</span></span>
+<span class="cell meta">15x15</span>
+<span class="cell meta">DPN 1417</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 126回</span></a></li></ul></div>
+</section>
+
+<section>
+<h2>推定が低すぎる<span class="count">10件</span></h2>
+<p class="note">申告より易しく評価してしまった問題。<strong>10 件中 7 件が申告 ★5</strong> で、上振れ側とはちょうど反対に、難しいと申告された問題ほど推定が下振れします。盤面はやはりまちまち（6x5 から 10x10）で、サイズによる偏りではありません。</p>
+<p class="note">こちらは 10 件中 8 件がソルバーの手筋だけで完走しています。<strong>ソルバーにとっては単調な作業でも、人間には長時間の集中を要する</strong> — その負荷は手筋の発火回数に現れません。★5 の申告には「解けるが骨が折れる」という評価が含まれており、そこは現在のスコアが原理的に測れない部分です。</p>
+<div class="scroller"><ul class="rows"><li class="row"><a class="row-link" href="https://puzz.link/p?slither/10/10/gc3c823727227djch232cg2dj332dj2cg322dhcj823728327c2cc" target="_blank" rel="noopener">
+<span class="cell id">#106706</span>
+<span class="cell verdict"><span class="declared">申告 5</span><span class="arrow">→</span><span class="estimate under">2.99</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:19.33303074601421%"></span></span><span class="delta-num under">-2.01</span></span>
+<span class="cell meta">10x10</span>
+<span class="cell meta">DPN 1761</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 47回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/6/5/cd7ab75165b8b" target="_blank" rel="noopener">
+<span class="cell id">#124816</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate under">1.00</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:19.158213447272725%"></span></span><span class="delta-num under">-2.00</span></span>
+<span class="cell meta">6x5</span>
+<span class="cell meta">DPN 178</span>
+<span class="cell state"><span class="pill pill-done">仮置き不要</span></span>
+<span class="cell meta trial">仮置きなし</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/7/7/i682agdg6cbib8bgcg358bg" target="_blank" rel="noopener">
+<span class="cell id">#172543</span>
+<span class="cell verdict"><span class="declared">申告 4</span><span class="arrow">→</span><span class="estimate under">2.11</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:18.111388569292387%"></span></span><span class="delta-num under">-1.89</span></span>
+<span class="cell meta">7x7</span>
+<span class="cell meta">DPN 855</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 7回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/5/5/hcg8316768dgc" target="_blank" rel="noopener">
+<span class="cell id">#160257</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate under">1.34</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:15.957397505454544%"></span></span><span class="delta-num under">-1.66</span></span>
+<span class="cell meta">5x5</span>
+<span class="cell meta">DPN 325</span>
+<span class="cell state"><span class="pill pill-done">仮置き不要</span></span>
+<span class="cell meta trial">仮置きなし</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/6/6/l22112231112222222122223cj" target="_blank" rel="noopener">
+<span class="cell id">#17570</span>
+<span class="cell verdict"><span class="declared">申告 5</span><span class="arrow">→</span><span class="estimate under">3.36</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:15.747102065351223%"></span></span><span class="delta-num under">-1.64</span></span>
+<span class="cell meta">6x6</span>
+<span class="cell meta">DPN 2234</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ2 / 35回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/10/10/h6bb112121121b6bbh6bb212121111b6bbh6bb212121121b6bb66bb" target="_blank" rel="noopener">
+<span class="cell id">#165730</span>
+<span class="cell verdict"><span class="declared">申告 5</span><span class="arrow">→</span><span class="estimate under">3.37</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:15.65221128587214%"></span></span><span class="delta-num under">-1.63</span></span>
+<span class="cell meta">10x10</span>
+<span class="cell meta">DPN 2247</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 75回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/8/7/i22ch2232d22311c21132c32322cg227ccj" target="_blank" rel="noopener">
+<span class="cell id">#119578</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate under">1.40</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:15.341813105454547%"></span></span><span class="delta-num under">-1.60</span></span>
+<span class="cell meta">8x7</span>
+<span class="cell meta">DPN 353</span>
+<span class="cell state"><span class="pill pill-done">仮置き不要</span></span>
+<span class="cell meta trial">仮置きなし</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/10/10/dan8dgaka8aiag8adt35dnatad" target="_blank" rel="noopener">
+<span class="cell id">#20870</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate under">1.46</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:14.81835272727273%"></span></span><span class="delta-num under">-1.54</span></span>
+<span class="cell meta">10x10</span>
+<span class="cell meta">DPN 377</span>
+<span class="cell state"><span class="pill pill-done">仮置き不要</span></span>
+<span class="cell meta trial">仮置きなし</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/7/7/g22b5111cg12cbkd12dg3227a32d" target="_blank" rel="noopener">
+<span class="cell id">#107198</span>
+<span class="cell verdict"><span class="declared">申告 4</span><span class="arrow">→</span><span class="estimate under">2.53</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:14.124866371586421%"></span></span><span class="delta-num under">-1.47</span></span>
+<span class="cell meta">7x7</span>
+<span class="cell meta">DPN 1181</span>
+<span class="cell state"><span class="pill pill-mid">仮置きあり</span></span>
+<span class="cell meta trial">深さ1 / 32回</span></a></li><li class="row"><a class="row-link" href="https://puzz.link/p?slither/15/14/zzpbq6cp112bo1212bp2111cn2111cn6cqbzzp" target="_blank" rel="noopener">
+<span class="cell id">#12729</span>
+<span class="cell verdict"><span class="declared">申告 3</span><span class="arrow">→</span><span class="estimate under">1.53</span></span>
+<span class="cell delta"><span class="bar"><span class="bar-fill under" style="right:50%;width:14.102273033911882%"></span></span><span class="delta-num under">-1.47</span></span>
+<span class="cell meta">15x14</span>
+<span class="cell meta">DPN 419</span>
+<span class="cell state"><span class="pill pill-done">仮置き不要</span></span>
+<span class="cell meta trial">仮置きなし</span></a></li></ul></div>
+</section>
+
+<section>
+<h2>盤面の大きさによる交絡<span class="count">正規化の検証</span></h2>
+<p class="note">盤面の大きさ自体が難易度の信号です（申告と盤面サイズの順位相関は <strong>0.27</strong>）。手筋の発火回数はセル数とともに増えるので、素のスコアをそのまま使うと「大きさを当てているだけ」になりかねません。</p>
+<p class="note">そこでスコアを <code>DP / セル数<sup>0.35</sup></code> に正規化しています。指数 1.0（単純にセル数で割る）では割りすぎで、★3 の問題を比べると 30 セル未満と 110 セル以上で中央値が <strong>3.14 倍</strong>も開き、全体相関も 0.48 まで落ちていました。指数を振って測り、相関の頂点（0.2）とサイズ中立点（0.45）の中間として 0.35 を採っています。</p>
+<p class="note">サイズを固定した層内でも相関は保たれます。加重平均 <strong>0.702</strong> は全体の 0.734 とほぼ同じで、<strong>スコアが見ているのは大きさではなく本物の難易度</strong>だと言えます。</p>
+<table>
+<thead><tr><th>盤面（セル数）</th><th>問題数</th><th>層内の順位相関</th></tr></thead>
+<tbody><tr><td>36 セル</td><td>103</td><td>0.744</td></tr><tr><td>49 セル</td><td>71</td><td>0.610</td></tr><tr><td>64 セル</td><td>64</td><td>0.668</td></tr><tr><td>81 セル</td><td>71</td><td>0.740</td></tr><tr><td>100 セル</td><td>867</td><td>0.714</td></tr><tr><td>121 セル</td><td>71</td><td>0.580</td></tr></tbody></table>
+</section>
+
+<section>
+<h2>コーパスの一意性<span class="count">評価してよい問題か</span></h2>
+<p class="note">解が一つに定まらない問題に難易度をつけるのは無意味です。手筋ソルバーは必ず手詰まりになり、
+手詰まりへの罰点で「難しい問題」として高いスコアが出てしまいます。そこで全 1,585 問を制約エンジンの
+全解探索にかけました。</p>
+<table>
+<thead><tr><th>判定</th><th>問題数</th><th>割合</th></tr></thead>
+<tbody>
+<tr><td>一意</td><td>1,504</td><td>94.9%</td></tr>
+<tr><td>複数解</td><td>2</td><td>0.13%</td></tr>
+<tr><td>解なし</td><td>0</td><td>—</td></tr>
+<tr><td>判定できず</td><td>79</td><td>5.0%</td></tr>
+</tbody></table>
+<p class="note"><strong>複数解は 2 問だけ</strong>でした。いずれもこのシートから除外しています。
+うち 1 問（20x12・申告 ★3）は通常の探索上限では打ち切られており、上限を外して 1 時間 51 分かけた
+再検査で初めて見つかりました。<code>solve</code> は複数解を検出すると難易度の代わりに <code>-</code> を
+返します。</p>
+<p class="note">判定できなかった 79 問は<strong>複数解である証拠がありません</strong>。探索が本質的に
+重いだけと見ています — うち 50 問は 120 セル以下で、通常なら 0.07 秒で判定できる規模です。
+機械にとっての重さと人にとっての難しさが別物であることの、極端な例と言えます。</p>
+</section>
+
+<section>
+<h2>この推定の限界</h2>
+<p class="note">★5 は 36 問しかなく、そのうち 7 割は手筋が尽きて完走できません。最上位の境界は根拠が薄く、参考値と考えてください。</p>
+<p class="note">また、上の 2 つの外れ値リストが示すとおり、<strong>ずれは申告の両極に集中</strong>します。★1〜★2 では過大に、★4〜★5 では過小に出る — つまり<strong>推定は中央に寄る</strong>傾向があります。回帰的な推定にはつきものの性質ですが、両端の問題ほど当てにくいことは頭に置いてください。盤面の大きさによる偏りは、正規化を入れた時点でほぼ解消しています。</p>
+<p class="note">申告側の癖も残ります。投稿者ごとに評価の基準は異なり、同じ難しさでも 1 段階ずれることがあります。±1 以内が 98% というのは、その揺れを含んだ数字です。</p>
+</section>
+</div>

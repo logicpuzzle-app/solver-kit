@@ -1,0 +1,224 @@
+/**
+ * Mannequin Solver
+ *
+ * Rules:
+ * 1. Place mannequin figures in the grid
+ * 2. Each figure consists of head, body, arms, and legs
+ * 3. Numbers indicate clues about mannequin placement
+ * 4. Mannequins cannot overlap
+ */
+
+import { Position } from '../core/types.js';
+import { FieldState, Grid } from '../core/field.js';
+import { BaseSolver, BranchCandidate } from '../core/solver.js';
+
+// ============================================
+// Mannequin Types
+// ============================================
+
+export enum MannequinPart {
+  EMPTY = 0,
+  HEAD = 1,
+  BODY = 2,
+  ARM = 3,
+  LEG = 4,
+}
+
+// ============================================
+// Mannequin Field State
+// ============================================
+
+export class MannequinField implements FieldState<MannequinField> {
+  readonly height: number;
+  readonly width: number;
+  /** Cell contents */
+  private cells: Grid<MannequinPart>;
+  /** Number clues */
+  private clues: Grid<number | null>;
+
+  constructor(height: number, width: number) {
+    this.height = height;
+    this.width = width;
+    this.cells = new Grid(height, width, () => MannequinPart.EMPTY);
+    this.clues = new Grid(height, width, () => null);
+  }
+
+  setClue(row: number, col: number, value: number): void {
+    this.clues.set(row, col, value);
+  }
+
+  getCell(row: number, col: number): MannequinPart {
+    if (row < 0 || row >= this.height || col < 0 || col >= this.width) {
+      return MannequinPart.EMPTY;
+    }
+    return this.cells.get(row, col);
+  }
+
+  setCell(row: number, col: number, part: MannequinPart): void {
+    this.cells.set(row, col, part);
+  }
+
+  private countAdjacentParts(row: number, col: number): number {
+    let count = 0;
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = row + dr;
+        const nc = col + dc;
+        if (nr >= 0 && nr < this.height && nc >= 0 && nc < this.width) {
+          if (this.cells.get(nr, nc) !== MannequinPart.EMPTY) {
+            count++;
+          }
+        }
+      }
+    }
+    return count;
+  }
+
+  clone(): MannequinField {
+    const cloned = new MannequinField(this.height, this.width);
+    for (let row = 0; row < this.height; row++) {
+      for (let col = 0; col < this.width; col++) {
+        cloned.cells.set(row, col, this.cells.get(row, col));
+        cloned.clues.set(row, col, this.clues.get(row, col));
+      }
+    }
+    return cloned;
+  }
+
+  getStateDump(): string {
+    let dump = '';
+    for (let row = 0; row < this.height; row++) {
+      for (let col = 0; col < this.width; col++) {
+        dump += this.cells.get(row, col);
+      }
+    }
+    return dump;
+  }
+
+  isSolved(): boolean {
+    for (let row = 0; row < this.height; row++) {
+      for (let col = 0; col < this.width; col++) {
+        const clue = this.clues.get(row, col);
+        if (clue !== null) {
+          if (this.countAdjacentParts(row, col) !== clue) return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  solveAndCheck(): boolean {
+    for (let row = 0; row < this.height; row++) {
+      for (let col = 0; col < this.width; col++) {
+        const clue = this.clues.get(row, col);
+        if (clue !== null) {
+          const count = this.countAdjacentParts(row, col);
+          if (count > clue) return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  toString(): string {
+    const lines: string[] = [];
+    for (let row = 0; row < this.height; row++) {
+      let line = '';
+      for (let col = 0; col < this.width; col++) {
+        const clue = this.clues.get(row, col);
+        if (clue !== null) {
+          line += String(clue);
+        } else {
+          const cell = this.cells.get(row, col);
+          if (cell === MannequinPart.HEAD) line += 'H';
+          else if (cell === MannequinPart.BODY) line += 'B';
+          else if (cell === MannequinPart.ARM) line += 'A';
+          else if (cell === MannequinPart.LEG) line += 'L';
+          else line += '.';
+        }
+      }
+      lines.push(line);
+    }
+    return lines.join('\n');
+  }
+
+  getFirstEmptyCell(): Position | null {
+    for (let row = 0; row < this.height; row++) {
+      for (let col = 0; col < this.width; col++) {
+        if (this.cells.get(row, col) === MannequinPart.EMPTY && this.clues.get(row, col) === null) {
+          return { row, col };
+        }
+      }
+    }
+    return null;
+  }
+}
+
+// ============================================
+// Mannequin Solver
+// ============================================
+
+export class MannequinSolver extends BaseSolver<MannequinField> {
+  constructor(field: MannequinField) {
+    super(field);
+  }
+
+  static fromString(height: number, width: number, param: string): MannequinSolver {
+    const field = new MannequinField(height, width);
+
+    const ALPHABET_FROM_G = 'ghijklmnopqrstuvwxyz';
+    let index = 0;
+
+    for (let i = 0; i < param.length && index < height * width; i++) {
+      const ch = param[i];
+      const interval = ALPHABET_FROM_G.indexOf(ch);
+
+      if (interval !== -1) {
+        index += interval + 1;
+      } else {
+        const row = Math.floor(index / width);
+        const col = index % width;
+
+        let num: number;
+        if (ch === '-') {
+          num = parseInt(param[i + 1] + param[i + 2], 16);
+          i += 2;
+        } else {
+          num = parseInt(ch, 16);
+        }
+
+        if (!isNaN(num) && row < height && col < width) {
+          field.setClue(row, col, num);
+        }
+        index++;
+      }
+    }
+
+    return new MannequinSolver(field);
+  }
+
+  protected getBranchCandidates(state: MannequinField): BranchCandidate<MannequinField>[] {
+    const empty = state.getFirstEmptyCell();
+    if (!empty) return [];
+
+    return [
+      {
+        apply: (s) => {
+          const cloned = s.clone();
+          cloned.setCell(empty.row, empty.col, MannequinPart.BODY);
+          return cloned;
+        },
+        description: `Place BODY at (${empty.row}, ${empty.col})`,
+      },
+      {
+        apply: (s) => {
+          const cloned = s.clone();
+          // Keep empty
+          return cloned;
+        },
+        description: `Keep (${empty.row}, ${empty.col}) empty`,
+      },
+    ];
+  }
+}

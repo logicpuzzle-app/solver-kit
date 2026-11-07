@@ -1,0 +1,17 @@
+{
+  "apphosting": {
+    "backendId": "solver",
+    "rootDir": ".",
+    "ignore": [
+      "wasm/target",
+      "node_modules",
+      ".git",
+      "scripts",
+      "*.log",
+      ".numlin-chrome-*",
+      "*.png",
+      "SPEC-*.md",
+      "NUMLIN-INTEGRATION.md"
+    ]
+  }
+}
