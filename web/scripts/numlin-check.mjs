@@ -216,7 +216,7 @@ try {
   const englishDfs = await evaluate(state);
   assert.equal(englishDfs.label, "Unique solution"); assert.ok(englishDfs.detail.includes("Engine"));
   assert.equal(await evaluate("document.documentElement.lang"), "en");
-  assert.ok(await evaluate("document.title.includes('Numberlink') && document.querySelector('#url').placeholder.includes(' or ')"));
+  assert.ok(await evaluate("document.title.includes('puzzle types') && document.querySelector('#url').placeholder.includes(' or ')"));
   assert.equal(await evaluate("document.querySelector('#board svg').getAttribute('aria-label')"), "Answer");
   assert.ok(await evaluate("document.querySelector('footer').textContent.includes('Calibration') && document.querySelector('#changelog').textContent.includes('Added Numberlink support.')"));
   await evaluate("document.querySelector('[name=language][value=ja]').click()");
