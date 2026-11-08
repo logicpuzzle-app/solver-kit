@@ -251,6 +251,15 @@ try {
     const sat = await evaluate("sdk.solve('p?numlin/2/2/1h1',{engine:'sat',threads:2,onProgress:()=>{throw Error('consumer callback')}})");
     contract(sat, "numlin"); assert.equal(sat.raw.engine, "sat");
     assert.equal(await evaluate(`sdk.renderAnswer(${JSON.stringify(sat)}).querySelectorAll('polyline').length>0`), true);
+    // Canonically unique but a path can be rerouted through free cells: not unique (cspuz-solver2 agrees).
+    for (const engine of ["dfs", "sat"]) {
+      const detour = await evaluate(`sdk.solve('https://puzz.link/p?numlin/5/5/l1q1l',{engine:'${engine}',threads:2}).then(r=>({r,
+        dashed:sdk.renderAnswer(r).querySelectorAll('polyline.answer-detour').length}))`);
+      contract(detour.r, "numlin");
+      assert.equal(detour.r.solutions, "2+", engine); assert.equal(detour.r.answerKind, "example", engine);
+      assert.equal(detour.r.raw.canonical_answers, 1, engine); assert.ok(detour.r.raw.detour.length >= 2, engine);
+      assert.equal(detour.dashed, 1, engine);
+    }
     assert.equal(await evaluate("document.querySelectorAll('link[rel=stylesheet]').length"), 0);
     assert.ok(!requests.some(url => new URL(url).pathname.endsWith("/style.css")), "Host loaded solver CSS");
     assert.equal(await evaluate(`(()=>{

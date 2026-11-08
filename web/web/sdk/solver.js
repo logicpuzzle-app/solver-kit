@@ -1,4 +1,5 @@
 import { solveNumlin, isNumlinUrl } from "../numlin/core.js";
+import { findDetour } from "../numlin/detour.js";
 import { createWorker } from "./worker.js";
 import { resolveEngine, resolveThreads } from "./options.js";
 import { isKitUrl, cspuzKinds, supportedKind, cspuzQuery } from "./kinds.js";
@@ -181,6 +182,11 @@ export async function solveRaw(url, { signal, onProgress, engine = "auto", threa
           // A consumer callback must not interrupt scheduler cleanup or leave a solve pending.
           if (!controller.signal.aborted) { try { onProgress?.(p); } catch {} }
         } });
+      // The engines count only canonical answers; a free-cell reroute is another answer (as in cspuz-solver2).
+      if (raw.status === "complete" && raw.answers === 1 && raw.answer) {
+        const detour = findDetour(raw.answer);
+        if (detour) Object.assign(raw, { answers: 2, canonical_answers: 1, detour });
+      }
       const invalidKeys = ["error_url", "error_pairs", "error_dimensions", "error_hints", "error_engine", "error_workers"];
       result = { raw, status: raw.status === "complete" ? "ok" : raw.status === "stopped" ? "aborted"
         : invalidKeys.includes(raw.error_key) ? "invalid" : "error", error: raw.error, errorKey: raw.error_key };

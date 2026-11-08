@@ -47,7 +47,7 @@ export function boardSVG(raw, { doc = document, labels = {} } = {}) {
 
 function numlinSVG(r, svgEl, labels, doc) {
   if (r.answer) {
-    const svg = answerSVG(r.answer, r.clues, labels.answer ?? "Answer", { doc });
+    const svg = answerSVG(r.answer, r.clues, labels.answer ?? "Answer", { doc, detour: r.detour });
     svg.setAttribute("width", Math.min(r.width * CELL, NUMLIN_MAX_WIDTH));
     svg.removeAttribute("height");
     return svg;

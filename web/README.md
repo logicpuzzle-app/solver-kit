@@ -78,6 +78,12 @@ URL にあるときは開いた状態で表示)。
 必ず 1/2/4/8 に丸める)、`url` も指定できる。最後の選択は localStorage の `numlin-engine` /
 `numlin-threads` に保存する("auto" も保存値になる)。
 
+両エンジンとも自明な迂回(2×2 に線が 3 本以上入る形)を禁じて、経路の形が異なる解だけを数える。
+そのため経路の形で唯一でも、空きマスを通って線を迂回させた別解がありうる。SDK の `solve` は
+そのような唯一解の後に cspuz-solver2 と同じ検査(`web/numlin/detour.js`、`find_another_answer` の移植)を
+行い、別経路があれば `solutions: "2+"`・`answerKind: "example"` とし、`raw.detour`(迂回経路のセル番号)・
+`raw.canonical_answers: 1` を付ける。解答図には迂回経路を赤の破線で描く。
+
 `web/numlin.js` がページ内の Scheduler を駆動し、module Web Worker で探索する。
 SAT は選択したワーカー数で cube を探索する。既定では400セル以下(20×20まで)で
 単体 SAT Worker を1個追加し、即時に競争させる(layout C)。それより大きい盤面は

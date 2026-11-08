@@ -112,11 +112,16 @@ try {
     const result = await submit(url); assert.equal(result.label, label); assert.equal(result.stars, 0);
     assert.ok(result.svg); console.log(JSON.stringify({ test: url, ...result }));
   }
+  const detour = await submit("p?numlin/5/5/l1q1l");
+  assert.equal(detour.label, "解が複数あります"); assert.match(detour.sub, /迂回/);
+  assert.match(detour.detail, /解の数\(上限 2\)2 以上/);
+  assert.equal(await evaluate("document.querySelectorAll('polyline.answer-detour').length"), 1);
+  console.log(JSON.stringify({ test: "detour", ...detour }));
   // Exercise both optional portfolio layouts through the actual adapter and details UI.
   const originalPortfolio = await evaluate("import('./numlin/scheduler.js').then(m=>({layout:m.defaults.layout,plain_start:m.defaults.plain_start}))");
   for (const layout of ["B", "C"]) {
     await evaluate(`import('./numlin/scheduler.js').then(m=>{m.defaults.layout='${layout}';m.defaults.plain_start='immediate'})`);
-    const r = await submit("p?numlin/2/2/1h1");
+    const r = await submit("p?numlin/2/1/11");
     assert.equal(r.label, "唯一解"); assert.match(r.detail, /先着(?:単体 SAT|cube 分割)/);
     assert.ok(await evaluate("window.testWorkers.filter(w=>w.testUrl.includes('/numlin/')).every(w=>w.testTerminated)"));
     console.log(JSON.stringify({test: `portfolio ${layout}`, ...r}));
@@ -300,7 +305,7 @@ try {
   console.log("PASS DFS abort during loading and direction race returns to idle");
 
   await chooseEngine("sat"); await chooseThreads(4);
-  const satSwitch = await submit("p?numlin/2/2/1h1");
+  const satSwitch = await submit("p?numlin/2/1/11");
   assert.equal(satSwitch.label, "唯一解"); assert.match(satSwitch.detail, /cspuz_core fork/);
   assert.equal((await evaluate(detailsMap))["ワーカー数"], "5");
   console.log("PASS radio switch back to SAT, 4 cube / 5 created workers");

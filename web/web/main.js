@@ -291,7 +291,7 @@ function renderNumlin(r) {
   const complete = r.status === "complete";
   verdict({
     label: !complete ? t("stopped_error") : r.answers >= 2 ? t("multiple_solutions") : r.answers === 1 ? t("unique_solution") : t("no_solution"),
-    sub: t("numlin_difficulty"),
+    sub: complete && r.detour ? t("detour_note") : t("numlin_difficulty"),
     tone: !complete ? "warn" : r.answers === 1 ? "" : "bad",
   });
   replaceBoard(r);
@@ -301,7 +301,7 @@ function renderNumlin(r) {
   }
   details([
     [t("board_size"), r.width ? `${r.width}×${r.height}` : "—"],
-    [t("answers_limit"), complete ? r.engine === "dfs" && r.answers >= 2 ? t("at_least_two") : String(r.answers) : t("search_incomplete", { n: Math.min(r.answers, 2) })],
+    [t("answers_limit"), complete ? r.detour || r.engine === "dfs" && r.answers >= 2 ? t("at_least_two") : String(r.answers) : t("search_incomplete", { n: Math.min(r.answers, 2) })],
     ...(r.engine === "dfs" ? [] : [[t("winner"), r.winner === "plain" ? t("plain_sat") : r.winner === "cubes" ? t("cube_split") : "—"]]),
     [t("elapsed"), `${(r.wall_ms / 1000).toFixed(3)} s`],
     [t("workers"), r.threads],

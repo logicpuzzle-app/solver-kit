@@ -39,7 +39,7 @@ export function answerText(answer, clues) {
 
 const palette = ['#3b82c4', '#c1642b', '#269076', '#ac60b4', '#be526d', '#7c79cd', '#a37c22', '#2895a1', '#93823c', '#a3678f', '#67934b', '#778caa'];
 const directions = [[1,0,-1], [2,1,0], [4,0,1], [8,-1,0]];
-export function answerSVG(answer, clues, label = 'Answer', { doc = document } = {}) {
+export function answerSVG(answer, clues, label = 'Answer', { doc = document, detour } = {}) {
   const {width:w, height:h, links} = answer;
   const svg = (tag, attrs) => {
     const node = doc.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -67,6 +67,8 @@ export function answerSVG(answer, clues, label = 'Answer', { doc = document } = 
     root.append(svg('polyline', {points:points.join(' '), stroke:palette[values.indexOf(clues[c])%palette.length], class:'answer-path',
       fill:'none', 'stroke-width':4, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
   }
+  if (detour?.length > 1) root.append(svg('polyline', {points:detour.map(c => `${c%w*24+13},${Math.floor(c/w)*24+13}`).join(' '),
+    class:'answer-detour', stroke:'#d62828', fill:'none', 'stroke-width':2.5, 'stroke-dasharray':'4 3', 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
   for (let c=0; c<clues.length; c++) {
     if (!clues[c]) continue;
     const x = c%w*24+13, y = Math.floor(c/w)*24+13;

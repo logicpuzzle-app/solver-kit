@@ -365,6 +365,10 @@ export const I18N = {
     "ja": "解の数(上限 2)",
     "en": "Solutions (up to 2)"
   },
+  "detour_note": {
+    "ja": "経路の形が異なる解は 1 つですが、赤の破線のように線を迂回させた別解があります",
+    "en": "Only one solution differs in path topology, but a path can be rerouted as shown by the red dashed line"
+  },
   "at_least_two": {
     "ja": "2 以上",
     "en": "2 or more"
